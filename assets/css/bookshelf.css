@@ -58,6 +58,8 @@
     background-color: #b0aeab;
     transform-origin: bottom;
     transform: skewX(-45deg);
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255, 0.25), rgba(255,255,255, 0.25) 1px, transparent 5px, transparent 1px);
+    background-size: 8px 8px;
 }
 
 .book .bookFront {
