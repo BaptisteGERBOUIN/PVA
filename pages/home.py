@@ -9,19 +9,28 @@ def layout():
 
 def getBookshelf():
     return html.Div([
-        getBook('home', '/'),
-        getBook('data context', '/data'),
-        getBook('baptiste', '/baptiste'),
-        getBook('alexandre', '/alexandre'),
-        getBook('table', '/table')
+        getBook('home', '/', 'I'),
+        getBook('data context', '/data', 'II'),
+        getBook('baptiste', '/baptiste', 'III'),
+        getBook('alexandre', '/alexandre', 'IV'),
+        getBook('table', '/table', 'V')
     ], id='bookshelf')
 
-def getBook(id: str, url: str):
+def getBook(id: str, url: str, roman: str):
     return html.A([
         html.Div(className='bookTop'),
         html.Div([
             html.Div(className='bookLeft'),
-            html.Div(id.upper(), className='bookTitle'),
-            html.Div(className='bookRight')
+            html.P(id, className='bookText bookTitle'),
+            html.Div(className='bookRight'),
+            html.Div(className='bookBarFront BookBar1'),
+            html.Div(className='bookBarSide BookBar1'),
+            html.Div(className='bookBarFront BookBar2'),
+            html.Div(className='bookBarSide BookBar2'),
+            html.Div(className='bookBarFront BookBar3'),
+            html.Div(className='bookBarSide BookBar3'),
+            html.Div(className='bookBarFront BookBar4'),
+            html.Div(className='bookBarSide BookBar4'),
+            html.P(roman, className='bookText bookIndex'),
         ], className='bookFront'),
     ], href=url, id=id.replace(' ', '_'), className='book')
