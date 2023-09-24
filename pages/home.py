@@ -4,7 +4,16 @@ register_page(__name__, path='/', title='PVA')
 
 def layout():
     return html.Div([
-        getBookshelf()
+        getBookshelf(),
+        html.Button("On", className="sun"),
+        html.Div(className="shelfborder"),
+        html.Div(className="shelfin"),
+        html.Div(className="diagonal1"),
+        html.Div(className="shelfbas"),
+        html.Div(className="shelfhaut"),
+        html.Div(className="shelfcotegauche"),
+        html.Div(className="shelfcotedroit"),
+        html.Div(className="fonddelachambre")
     ], id='window')
 
 def getBookshelf():
