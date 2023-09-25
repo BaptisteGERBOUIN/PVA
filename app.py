@@ -4,7 +4,7 @@ from dash_bootstrap_components import themes, icons
 app = Dash(
     __name__,
     use_pages=True,
-    external_stylesheets=[themes.PULSE, icons.FONT_AWESOME, './css/bookshelf.css'],
+    external_stylesheets=[themes.PULSE, icons.BOOTSTRAP],
     suppress_callback_exceptions=True
 )
 
