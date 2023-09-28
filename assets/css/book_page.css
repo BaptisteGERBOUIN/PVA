@@ -4,8 +4,9 @@
     align-items: center;
     height: 100vh;
 
-    --bookPageWidth: 350px;
-    --bookPageHeight: 500px;
+    --bookPageWidth: 25vw; /*350px*/
+    --bookPageHeight: 70vh; /*500px*/
+    transition: 0s;
 }
 
 .bookPage {
@@ -17,6 +18,12 @@
     height: var(--bookPageHeight);
     user-select: none;
     text-decoration: none;
+    transform-origin: left;
+}
+
+.bookPage:hover {
+    transform: rotateY(180deg) scale(3.5) translateX(10vw);
+    transition: 3.5s;
 }
 
 .bookPage > * {
@@ -31,9 +38,9 @@
 }
 
 .bookPage .bar1 {
-    top: 16px;
+    top: 3.2%;
     width: var(--bookPageWidth);
-    height: 12px;
+    height: 2.4%;
     background-color: gold;
 }
 
@@ -42,13 +49,13 @@
     justify-content: center;
     align-items: center;
     width: calc(var(--bookPageWidth) / 2 + var(--bookPageWidth) / 4);
-    top: 64px;
+    top: 12.8%;
     border: 1px solid gold;
     background-color: #582817;
 }
 
 .bookPage .titleBox .title {
-    top: 64px;
+    top: 12.8%;
     text-transform: uppercase;
     color: rgb(255, 243, 178);
     font-size: 28px;
@@ -58,9 +65,9 @@
 }
 
 .bookPage .bar2 {
-    top: 36px;
+    top: 7.2%;
     width: var(--bookPageWidth);
-    height: 4px;
+    height: 0.8%;
     background-color: gold;
 }
 
@@ -81,15 +88,15 @@
 }
 
 .bookPage .bar3 {
-    bottom: 50px;
+    bottom: 10%;
     width: var(--bookPageWidth);
-    height: 1px;
+    height: 0.3%;
     background-color: gold;
 }
 
 .bookPage .bar4 {
-    bottom: 24px;
+    bottom: 4.8%;
     width: var(--bookPageWidth);
-    height: 1px;
+    height: 0.3%;
     background-color: gold;
 }
