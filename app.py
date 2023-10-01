@@ -1,6 +1,8 @@
 from dash import Dash, dcc, html, page_container
 from dash_bootstrap_components import themes, icons
 
+from view.sidebar import getSidebar
+
 app = Dash(
     __name__,
     use_pages=True,
@@ -9,8 +11,8 @@ app = Dash(
 )
 
 app.title = 'PVA'
-
 app.layout = html.Div([
+    getSidebar(),
     page_container
 ])
 
