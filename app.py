@@ -1,20 +1,25 @@
-from dash import Dash, dcc, html, page_container
+from dash import Dash, html, page_container
 from dash_bootstrap_components import themes, icons
 
-from view.sidebar import getSidebar
+from pages.menu.sidebar import getSidebar
 
 app = Dash(
     __name__,
     use_pages=True,
     external_stylesheets=[themes.PULSE, icons.BOOTSTRAP],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
 )
 
 app.title = 'PVA'
-app.layout = html.Div([
-    getSidebar(),
-    page_container
-])
+app._favicon = './images/water-drop.png'
+
+app.layout = html.Div(
+    [
+        getSidebar(),
+        html.Div(page_container, id='page_content'),
+    ],
+    className='d-flex',
+)
 
 if __name__ == '__main__':
     app.run(debug=True)

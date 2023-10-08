@@ -1,0 +1,9 @@
+body {
+    background-color: #F9F9F9;
+
+    --sidebar-width: 200px;
+}
+
+#page_content {
+    margin-left: var(--sidebar-width);
+}
