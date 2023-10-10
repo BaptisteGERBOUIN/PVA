@@ -14,9 +14,9 @@ def layout():
 
 def bar_charts():
     fig = px.bar(
-        get_water_flow_data().value_counts().reset_index(name='count'),
+        get_water_flow_data(),
         x='libelle_ecoulement',
-        y='count',
+        y='Quantité',
         color='libelle_ecoulement',
         title='Quantité des différentes catégories d\'écoulement d\'eau en France sur le mois de Juin.',
         log_y=True

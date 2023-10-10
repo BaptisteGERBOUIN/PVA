@@ -1,9 +1,9 @@
 from dash import html, register_page, dcc
 import plotly.express as px
 
-from data.api import get_nitrate_data
+from data.api_fetcher import get_nitrate_data
 
-register_page(__name__, title='Water A')
+register_page(__name__, title='Water B')
 
 def layout():
     return html.Div(
@@ -18,6 +18,6 @@ def scatter_charts():
         x='date_prelevement', 
         y='resultat', 
         markers=True,
-        title='Teneur en Nitrates à La Jalle de Blanquefort à Bordeaux '
+        title='Teneur en Nitrates à La Jalle de Blanquefort à Bordeaux.'
     )
     return fig.update_layout(showlegend=False, title_x=0.5)
