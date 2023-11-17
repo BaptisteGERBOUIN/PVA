@@ -18,7 +18,6 @@ def bar_charts():
         x='libelle_ecoulement',
         y='Quantité',
         color='libelle_ecoulement',
-        title='Quantité des différentes catégories d\'écoulement d\'eau en France sur le mois de Juin.',
-        log_y=True
+        title='Quantité des différentes catégories d\'écoulement d\'eau en France sur le mois de Juin 2023.',
     )
-    return fig.update_layout(showlegend=False)
+    return fig.update_layout(showlegend=True, title_x=0.5) 
