@@ -3,8 +3,10 @@ import json
 import plotly.express as px
 import pandas as pd
 from random import randint
+import numpy as np
+import geopandas as gpd
 
-# client = pymongo.MongoClient('mongodb://localhost:27017/')
+# client = pymongo.MongoClient('mongodb: //localhost: 27017/')
 
 # waterDB = client['water']
 # nitrate = waterDB['nitrate']
@@ -18,17 +20,35 @@ from random import randint
 
 # print(list(nitrate.find()))
 
+france = gpd.read_file('./data/territoire_france/departements_france.geojson')
+from shapely.ops import unary_union
 
-with open('./data/departements_france.geojson', 'r') as file:
-    js = json.load(file)
-    # print(len(js['features']))
-    # js['features'] = [i for i in js['features'] if i['properties']['code'] not in ['2A', '2B']]
-    # print(len(js['features']))
-    # file = open('./data/departements_france.geojson', 'w')
-    # json.dump(js, file)
+# https: //epsg.io/2154
+a = gpd.GeoSeries(unary_union(france['geometry']), crs=2154)
 
-    df = pd.DataFrame({'code': [code['properties']['code'] for code in js['features']], 'value': [randint(0, 100) for _ in js['features']]})
+# https: //wiki.openstreetmap.org/wiki/Zoom_levels
+bounds = a.bounds.iloc[0].to_dict()
+zoom = np.interp(
+    x=min(bounds['maxx'] - bounds['minx'], bounds['maxy'] - bounds['miny']), 
+    xp=[0.00025, 0.0007, 0.0014, 0.003, 0.006, 0.012, 0.024, 0.048, 0.096, 0.192, 0.3712, 0.768, 1.536, 3.072, 6.144, 11.8784, 23.7568, 47.5136, 98.304, 190.0544, 360.0], 
+    fp=[20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
 
-    fig = px.choropleth_mapbox(df, geojson=js, featureidkey='properties.code', color="value", locations='code')
-    fig.update_layout(mapbox_style="open-street-map")
-    fig.show()
+print(zoom)
+
+fig = px.choropleth_mapbox(
+    data_frame=france, 
+    geojson=france.geometry, 
+    # featureidkey='properties.code', 
+    locations=france.index, 
+    center={'lon': 2.45163, 'lat': 46.62401 + 0.25}, 
+    mapbox_style='open-street-map', 
+    zoom=zoom, 
+    opacity=0.94
+)
+
+fig.update_layout(
+    showlegend=False, 
+    margin={'r': 0, 't': 0, 'l': 0, 'b': 0}, 
+    # mapbox_bounds={'west': bounds['minx'], 'east': bounds['maxx'], 'south': bounds['miny'], 'north': bounds['maxy']}
+)
+fig.show()

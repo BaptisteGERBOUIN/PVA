@@ -1,0 +1,337 @@
+Code;Département;Région;Chef-lieu;Villes Principales;Superficie (km2);Population (2023) ;Densité (hab./km²)
+01;Ain;Auvergne-Rhône-Alpes;Bourg-en-Bresse;"Belley
+Bourg-en-Bresse
+Gex
+Nantua";5 762,4;657 856;114,2
+02;Aisne;Hauts-de-France;Laon;"Château-Thierry
+Laon
+Saint-Quentin
+Soissons
+Vervins";7 361,7;529 374;71,9
+03;Allier;Auvergne-Rhône-Alpes;Moulins;"Montluçon
+Moulins
+Vichy";7 340,1;335 628;45,7
+04;Alpes-de-Haute-Provence;Provence-Alpes-Côte d'Azur;Digne-les-Bains;"Barcelonnette
+Castellane
+Digne-les-Bains
+Forcalquier";6 925,2;165 451;23,9
+05;Hautes-Alpes;Provence-Alpes-Côte d'Azur;Gap;"Briançon
+Gap";5 548,7;140 605;25,3
+06;Alpes-Maritimes;Provence-Alpes-Côte d'Azur;Nice;"Grasse
+Nice";4 298,6;1 097 410;255,3
+07;Ardèche;Auvergne-Rhône-Alpes;Privas;"Largentière
+Privas
+Tournon-sur-Rhône";5 528,6;329 325;59,6
+08;Ardennes;Grand Est;Charleville-Mézières;"Charleville-Mézières
+Rethel
+Sedan
+Vouziers";5 229,4;269 701;51,6
+09;Ariège;Occitanie;Foix;"Foix
+Pamiers
+Saint-Girons";4 889,9;153 954;31,5
+10;Aube;Grand Est;Troyes;"Bar-sur-Aube
+Nogent-sur-Seine
+Troyes";6 004,2;311 435;51,9
+11;Aude;Occitanie;Carcassonne;"Carcassonne
+Limoux
+Narbonne";6 139,0;375 217;61,1
+12;Aveyron;Occitanie;Rodez;"Millau
+Rodez
+Villefranche-de-Rouergue";8 735,1;279 554;32,0
+13;Bouches-du-Rhône;Provence-Alpes-Côte d'Azur;Marseille;"Aix-en-Provence
+Arles
+Marseille
+Istres";5 087,5;2 048 070;402,6
+14;Calvados;Normandie;Caen;"Bayeux
+Caen
+Lisieux
+Vire";5 534,5;697 547;125,7
+15;Cantal;Auvergne-Rhône-Alpes;Aurillac;"Aurillac
+Mauriac
+Saint-Flour";5 726,0;144 379;25,2
+16;Charente;Nouvelle-Aquitaine;Angoulême;"Angoulême
+Cognac
+Confolens";5 956,0;351 718;59,1
+17;Charente-Maritime;Nouvelle-Aquitaine;La Rochelle;"Jonzac
+Rochefort
+La Rochelle
+Saintes
+Saint-Jean-d'Angély";6 863,8;655 709;95,5
+18;Cher;Centre-Val de Loire;Bourges;"Bourges
+Saint-Amand-Montrond
+Vierzon";7 235,0;300 933;41,6
+19;Corrèze;Nouvelle-Aquitaine;Tulle;"Brive-la-Gaillarde
+Tulle
+Ussel";5 856,8;239 190;40,8
+2A;Corse-du-Sud;Corse;Ajaccio;"Ajaccio
+Sartène";4 014,2;160 814;40,1
+2B;Haute-Corse;Corse;Bastia;"Bastia
+Corte
+Calvi";4 665,6;182 887;39,2
+21;Côte-d'Or;Bourgogne-Franche-Comté;Dijon;"Beaune
+Dijon
+Montbard";8 763,2;535 078;61,1
+22;Côtes-d'Armor;Bretagne;Saint-Brieuc;"Dinan
+Guingamp
+Lannion
+Saint-Brieuc";6 877,6;603 640;87,8
+23;Creuse;Nouvelle-Aquitaine;Guéret;"Aubusson
+Guéret";5 565,4;115 995;20,8
+24;Dordogne;Nouvelle-Aquitaine;Périgueux;"Bergerac
+Nontron
+Périgueux
+Sarlat-la-Canéda";9 060,0;412 807;45,6
+25;Doubs;Bourgogne-Franche-Comté;Besançon;"Besançon
+Montbéliard
+Pontarlier";5 232,6;545 209;104,2
+26;Drôme;Auvergne-Rhône-Alpes;Valence;"Die
+Nyons
+Valence";6 530,0;517 709;79,3
+27;Eure;Normandie;Évreux;"Les Andelys
+Bernay
+Évreux";6 039,9;599 668;99,3
+28;Eure-et-Loir;Centre-Val de Loire;Chartres;"Chartres
+Châteaudun
+Dreux
+Nogent-le-Rotrou";5 880,0;431 443;73,4
+29;Finistère;Bretagne;Quimper;"Brest
+Châteaulin
+Morlaix
+Quimper";6 733,0;917 179;136,2
+30;Gard;Occitanie;Nîmes;"Alès
+Nîmes
+Le Vigan";5 852,8;751 457;128,4
+31;Haute-Garonne;Occitanie;Toulouse;"Muret
+Saint-Gaudens
+Toulouse";6 309,3;1 415 757;224,4
+32;Gers;Occitanie;Auch;"Auch
+Condom
+Mirande";6 256,8;191 819;30,7
+33;Gironde;Nouvelle-Aquitaine;Bordeaux;"Blaye
+Bordeaux
+Langon
+Lesparre-Médoc
+Libourne
+Arcachon";9 975,6;1 636 391;152,6
+34;Hérault;Occitanie;Montpellier;"Béziers
+Lodève
+Montpellier";6 101,0;1 188 973;194,9
+35;Ille-et-Vilaine;Bretagne;Rennes;"Fougères-Vitré
+Redon
+Rennes
+Saint-Malo";6 774,7;1 088 855;160,7
+36;Indre;Centre-Val de Loire;Châteauroux;"Le Blanc
+Châteauroux
+La Châtre
+Issoudun";6 790,6;218 707;32,2
+37;Indre-et-Loire;Centre-Val de Loire;Tours;"Chinon
+Tours
+Loches";6 126,7;612 119;99,9
+38;Isère;Auvergne-Rhône-Alpes;Grenoble;"Grenoble
+La Tour-du-Pin
+Vienne";7 431,5;1 277 513;171,9
+39;Jura;Bourgogne-Franche-Comté;Lons-le-Saunier;"Dole
+Lons-le-Saunier
+Saint-Claude";4 999,2;258 798;51,8
+40;Landes;Nouvelle-Aquitaine;Mont-de-Marsan;"Dax
+Mont-de-Marsan";9 242,6;418 122;45,2
+41;Loir-et-Cher;Centre-Val de Loire;Blois;"Blois
+Vendôme
+Romorantin-Lanthenay";6 343,4;329 357;51,9
+42;Loire;Auvergne-Rhône-Alpes;Saint-Étienne;"Montbrison
+Roanne
+Saint-Étienne";4 780,6;768 508;160,7
+43;Haute-Loire;Auvergne-Rhône-Alpes;Le Puy-en-Velay;"Brioude
+Le Puy-en-Velay
+Yssingeaux";4 977,1;227 489;45,7
+44;Loire-Atlantique;Pays de la Loire;Nantes;"Nantes
+Saint-Nazaire
+Châteaubriant-Ancenis";6 874,4;1 445 171;212,1
+45;Loiret;Centre-Val de Loire;Orléans;"Montargis
+Orléans
+Pithiviers";6 775,2;682 304;100,7
+46;Lot;Occitanie;Cahors;"Cahors
+Figeac
+Gourdon";5 216,5;174 670;33,5
+47;Lot-et-Garonne;Nouvelle-Aquitaine;Agen;"Agen
+Marmande
+Villeneuve-sur-Lot
+Nérac";5 360,9;330 844;61,7
+48;Lozère;Occitanie;Mende;"Florac
+Mende";5 166,9;76 633;14,8
+49;Maine-et-Loire;Pays de la Loire;Angers;"Angers
+Cholet
+Saumur
+Segré";7 106,6;820 713;114,5
+50;Manche;Normandie;Saint-Lô;"Avranches
+Cherbourg
+Coutances
+Saint-Lô";5 951,5;495 093;83,4
+51;Marne;Grand Est;Châlons-en-Champagne;"Châlons-en-Champagne
+Épernay
+Reims
+Vitry-le-François";8 169,1;566 659;69,4
+52;Haute-Marne;Grand Est;Chaumont;"Chaumont
+Langres
+Saint-Dizier";6 210,6;171 798;27,7
+53;Mayenne;Pays de la Loire;Laval;"Château-Gontier
+Laval
+Mayenne";5 175,2;306 538;59,2
+54;Meurthe-et-Moselle;Grand Est;Nancy;"Val-de-Briey
+Lunéville
+Nancy
+Toul";5 245,9;732 590;139,6
+55;Meuse;Grand Est;Bar-le-Duc;"Bar-le-Duc
+Commercy
+Verdun";6 211,4;183 001;29,5
+56;Morbihan;Bretagne;Vannes;"Lorient
+Pontivy
+Vannes";6 822,6;764 161;112,0
+57;Moselle;Grand Est;Metz;"Forbach-Boulay-Moselle
+Sarrebourg-Château-Salins
+Sarreguemines
+Thionville
+Metz";6 216,3;1 049 155;168,8
+58;Nièvre;Bourgogne-Franche-Comté;Nevers;"Château-Chinon 
+Clamecy
+Nevers
+Cosne-Cours-sur-Loire";6 816,7;202 670;29,7
+59;Nord;Hauts-de-France;Lille;"Avesnes-sur-Helpe
+Cambrai
+Douai
+Dunkerque
+Lille
+Valenciennes";5 742,8;2 607 746;454,1
+60;Oise;Hauts-de-France;Beauvais;"Beauvais
+Clermont
+Compiègne
+Senlis";5 860,2;829 699;141,6
+61;Orne;Normandie;Alençon;"Alençon
+Argentan
+Mortagne-au-Perche";6 103,4;278 475;45,6
+62;Pas-de-Calais;Hauts-de-France;Arras;"Arras
+Béthune
+Boulogne-sur-Mer
+Montreuil
+Saint-Omer
+Calais
+Lens";6 671,4;1 462 167;219,2
+63;Puy-de-Dôme;Auvergne-Rhône-Alpes;Clermont-Ferrand;"Ambert
+Clermont-Ferrand
+Issoire
+Riom
+Thiers";7 969,7;661 852;83,0
+64;Pyrénées-Atlantiques;Nouvelle-Aquitaine;Pau;"Bayonne
+Oloron-Sainte-Marie
+Pau";7 644,8;687 240;89,9
+65;Hautes-Pyrénées;Occitanie;Tarbes;"Argelès-Gazost
+Bagnères-de-Bigorre
+Tarbes";4 464,0;229 788;51,5
+66;Pyrénées-Orientales;Occitanie;Perpignan;"Céret
+Perpignan
+Prades";4 116,0;482 765;117,3
+67;Bas-Rhin;Grand Est;Strasbourg;"Haguenau-Wissembourg
+Molsheim
+Saverne
+Sélestat-Erstein
+Strasbourg";4 755,0;1 148 073;241,4
+68;Haut-Rhin;Grand Est;Colmar;"Altkirch
+Colmar-Ribeauvillé
+Mulhouse
+Thann-Guebwiller";3 525,2;767 842;217,8
+69;Rhône;Auvergne-Rhône-Alpes;Lyon;"Lyon
+Villefranche-sur-Saône";3 249,1;1 883 437;579,7
+70;Haute-Saône;Bourgogne-Franche-Comté;Vesoul;"Lure
+Vesoul";5 360,1;234 601;43,8
+71;Saône-et-Loire;Bourgogne-Franche-Comté;Mâcon;"Autun
+Chalon-sur-Saône
+Charolles
+Louhans
+Mâcon";8 574,7;551 063;64,3
+72;Sarthe;Pays de la Loire;Le Mans;"La Flèche
+Mamers
+Le Mans";6 206,0;566 993;91,4
+73;Savoie;Auvergne-Rhône-Alpes;Chambéry;"Albertville
+Chambéry
+Saint-Jean-de-Maurienne";6 028,3;439 750;73,0
+74;Haute-Savoie;Auvergne-Rhône-Alpes;Annecy;"Annecy
+Bonneville
+Saint-Julien-en-Genevois
+Thonon-les-Bains";4 387,8;835 206;190,3
+75;Paris;Ile-de-France;Paris;Paris;105,4;2 145 906;20 359,6
+76;Seine-Maritime;Normandie;Rouen;"Dieppe
+Le Havre
+Rouen";6 277,6;1 254 739;199,9
+77;Seine-et-Marne;Ile-de-France;Melun;"Meaux
+Melun
+Provins
+Fontainebleau
+Torcy";5 915,3;1 428 636;241,5
+78;Yvelines;Ile-de-France;Versailles;"Mantes-la-Jolie
+Rambouillet
+Saint-Germain-en-Laye
+Versailles";2 284,4;1 449 723;634,7
+79;Deux-Sèvres;Nouvelle-Aquitaine;Niort;"Bressuire
+Niort
+Parthenay";5 999,4;374 481;62,4
+80;Somme;Hauts-de-France;Amiens;"Abbeville
+Amiens
+Montdidier
+Péronne";6 170,1;568 748;92,2
+81;Tarn;Occitanie;Albi;"Albi
+Castres";5 757,9;391 066;67,9
+82;Tarn-et-Garonne;Occitanie;Montauban;"Castelsarrasin
+Montauban";3 718,3;262 316;70,6
+83;Var;Provence-Alpes-Côte d'Azur;Toulon;"Draguignan
+Toulon
+Brignoles";5 972,5;1 085 189;181,7
+84;Vaucluse;Provence-Alpes-Côte d'Azur;Avignon;"Apt
+Avignon
+Carpentras";3 567,3;561 941;157,5
+85;Vendée;Pays de la Loire;La Roche-sur-Yon;"Fontenay-le-Comte
+La Roche-sur-Yon
+Les Sables-d'Olonne";6 719,6;692 705;103,1
+86;Vienne;Nouvelle-Aquitaine;Poitiers;"Châtellerault
+Montmorillon
+Poitiers";6 990,4;439 332;62,9
+87;Haute-Vienne;Nouvelle-Aquitaine;Limoges;"Bellac
+Limoges
+Rochechouart";5 520,1;372 123;67,4
+88;Vosges;Grand Est;Épinal;"Épinal
+Neufchâteau
+Saint-Dié-des-Vosges";5 873,8;362 397;61,7
+89;Yonne;Bourgogne-Franche-Comté;Auxerre;"Auxerre
+Avallon
+Sens";7 427,4;334 156;45,0
+90;Territoire de Belfort;Bourgogne-Franche-Comté;Belfort;Belfort;609,4;140 120;230,1
+91;Essonne;Ile-de-France;Évry-Courcouronnes;"Étampes
+Évry
+Palaiseau";1 804,4;1 306 118;724,0
+92;Hauts-de-Seine;Ile-de-France;Nanterre;"Antony
+Nanterre
+Boulogne-Billancourt";175,6;1 626 213;9 239,8
+93;Seine-Saint-Denis;Ile-de-France;Bobigny;"Bobigny
+Le Raincy
+Saint-Denis";236,2;1 655 422;7 014,5
+94;Val-de-Marne;Ile-de-France;Créteil;"Créteil
+Nogent-sur-Marne
+L'Haÿ-les-Roses";245,0;1 407 972;5 746,8
+95;Val-d'Oise;Ile-de-France;Pontoise;"Argenteuil
+Sarcelles
+Pontoise";1 245,9;1 251 804;1 004,7
+971;Guadeloupe;Guadeloupe;Basse-Terre;"Basse-Terre
+Pointe-à-Pitre";1 628,4;383 559;235,5
+972;Martinique;Martinique;Fort-de-France;"Fort-de-France
+La Trinité
+Le Marin
+Saint-Pierre";1 128,0;361 225;320,2
+973;Guyane;Guyane;Cayenne;"Cayenne
+Saint-Laurent-du-Maroni
+Saint-Georges";83 533,9;285 133;3,4
+974;La Réunion;La Réunion;Saint-Denis;"Saint-Denis
+Saint-Pierre
+Saint-Benoît
+Saint-Paul";2 503,7;863 083;344,7
+976;Mayotte;Mayotte;Dzaoudzi;"Dzaoudzi
+Mamoudzou
+Koungou";376,0;256 518;682,2

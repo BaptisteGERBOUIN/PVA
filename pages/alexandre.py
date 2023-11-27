@@ -4,6 +4,7 @@ import plotly.express as px
 from datetime import date
 
 from data.api_fetcher import get_water_flow_data
+from data.geojson_processing import FRANCE
 
 register_page(__name__, title='Water A')
 
@@ -13,6 +14,7 @@ def layout():
     return html.Div(
         [
             menu_map(),
+            dcc.Graph(figure=get_choropleth(), id='choropleth_mapbox')
         ],
     )
 
@@ -40,10 +42,24 @@ def menu_map():
 
 # --- FIGURE ---
 
+def get_choropleth():
+    fig = px.choropleth(
+        data_frame=FRANCE.gdf, 
+        geojson=FRANCE.gdf['geometry'], 
+        locations=FRANCE.gdf.index, 
+        center={'lon': FRANCE.geometry.centroid[0].x, 'lat': FRANCE.geometry.centroid[0].y + 0.25},
+        fitbounds='locations')
+
+    fig.update_layout(
+        showlegend=False, 
+        margin={'r': 0, 't': 0, 'l': 0, 'b': 0})
+
+    return fig
+
 # --- CALLBACKS ---
 
-fig = px.scatter_mapbox(geo_df,
-                        lat=geo_df.geometry.y,
-                        lon=geo_df.geometry.x,
-                        hover_name="name",
-                        zoom=1)
+# fig = px.scatter_mapbox(geo_df,
+#                         lat=geo_df.geometry.y,
+#                         lon=geo_df.geometry.x,
+#                         hover_name="name",
+#                         zoom=1)
