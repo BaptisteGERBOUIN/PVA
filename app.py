@@ -16,8 +16,9 @@ app._favicon = './images/water-drop.png'
 app.layout = html.Div(
     [
         getSidebar(),
-        html.Div(page_container, id='page_content'),
+        html.Div(page_container.children, id='page_content'),
     ],
+    id='layout',
     className='d-flex',
 )
 

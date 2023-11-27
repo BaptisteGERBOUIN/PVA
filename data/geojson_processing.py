@@ -12,27 +12,13 @@ CRS = 2154 # France
 
 class GeographicArea:
 
-    def get_zoom(bounds: dict[str, float]) -> float:
-        return interp(
-            x=min(bounds['maxx'] - bounds['minx'], bounds['maxy'] - bounds['miny']), 
-            xp=[0.00025, 0.0007, 0.0014, 0.003, 0.006, 0.012, 0.024, 0.048, 0.096, 
-                0.192, 0.3712, 0.768, 1.536, 3.072, 6.144, 11.8784, 23.7568, 47.5136, 
-                98.304, 190.0544, 360.0], 
-            fp=[20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-
-    def __init__(self, name: str, geometry: gpd.GeoSeries, gdf: gpd.GeoDataFrame=None, parent: str=None) -> None:
+    def __init__(self, name: str, geometry: gpd.GeoSeries, gdf: gpd.GeoDataFrame, parent: str=None) -> None:
         self.__name = name
         self.__geometry = gpd.GeoSeries(geometry)
         self.__gdf = gdf
 
         self.__parent = parent
         self.__childs: dict[str, GeographicArea] = {}
-
-        self.__zoom: float = GeographicArea.get_zoom(self.bounds)
-
-    @property
-    def zoom(self) -> float:
-        return self.__zoom
 
     def add_child(self, child: GeographicArea) -> None:
         self.__childs[child.__name] = child
@@ -61,6 +47,16 @@ class GeographicArea:
     def childs(self) -> dict[str, GeographicArea]:
         return deepcopy(self.__childs)
     
+    def get_from_path(self, path: list) -> GeographicArea:
+        if not path or (len(path) == 1 and path[0] == self.__name):
+            return self
+
+        for path_index in range(1, len(path)):
+            geoArea = self.__childs.get(path[path_index])
+            if geoArea is not None:
+                return geoArea.get_from_path(path[path_index:])
+        return None
+    
     def __get_string(self, space='  ') -> str:
         string = f'> {self.__name}\n{space}+ PARENT = {self.__parent}'
         if self.__childs:
@@ -73,9 +69,9 @@ class GeographicArea:
 
 def get_france() -> GeographicArea:
     gdfRegion: gpd.GeoDataFrame = gpd.read_file(
-        PATH_TO_DATA + 'regions_france.geojson')
+        PATH_TO_DATA + 'regions_france.geojson').rename(columns={'nom': 'name'})
     gdfDepartement: gpd.GeoDataFrame = gpd.read_file(
-        PATH_TO_DATA + 'departements_france.geojson')
+        PATH_TO_DATA + 'departements_france.geojson').rename(columns={'nom': 'name'})
     dfTerritoire: pd.DataFrame = pd.read_csv(
         PATH_TO_DATA + 'territoire-francais.csv', 
         usecols=['Code', 'Département', 'Région'], 
@@ -83,22 +79,24 @@ def get_france() -> GeographicArea:
     
     France = GeographicArea(
         name='France',
-        gdf=gdfRegion,
+        gdf=gdfRegion.set_index('code'),
         geometry=gpd.GeoSeries(unary_union(gdfRegion['geometry']), crs=CRS))
     
     for _, rowR in gdfRegion.iterrows():
-        filtered_gdf = gdfDepartement[gdfDepartement['nom'].isin(dfTerritoire[dfTerritoire['Région'] == rowR['nom']]['Département'])]
+        filtered_gdf = gdfDepartement[gdfDepartement['name'].isin(
+                dfTerritoire[dfTerritoire['Région'] == rowR['name']]['Département'])]
         Region = GeographicArea(
-            name=rowR['nom'], 
+            name=rowR['name'], 
             geometry=rowR['geometry'], 
-            gdf=filtered_gdf, 
+            gdf=filtered_gdf.set_index('code'), 
             parent='France')
 
         for _, rowD in filtered_gdf.iterrows():
             Departement = GeographicArea(
-                name=rowD['nom'], 
-                geometry=rowD['geometry'], 
-                parent=rowR['nom'])
+                name=rowD['name'], 
+                geometry=rowD['geometry'],
+                gdf=gpd.GeoDataFrame(rowD.to_frame().T.set_index('code')), 
+                parent=rowR['name'])
             Region.add_child(Departement)
 
         France.add_child(Region)

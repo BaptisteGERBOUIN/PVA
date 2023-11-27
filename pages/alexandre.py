@@ -1,22 +1,32 @@
-from dash import html, register_page, dcc
-import dash_bootstrap_components as dbc
-import plotly.express as px
 from datetime import date
 
+from dash import register_page, Input, Output, State, no_update, callback
+from dash import html, dcc
+
 from data.api_fetcher import get_water_flow_data
-from data.geojson_processing import FRANCE
+from data.geojson_processing import FRANCE, GeographicArea
+
+import dash_bootstrap_components as dbc
+import plotly.express as px
 
 register_page(__name__, title='Water A')
 
 # --- HTML ---
 
 def layout():
-    return html.Div(
-        [
-            menu_map(),
-            dcc.Graph(figure=get_choropleth(), id='choropleth_mapbox')
-        ],
-    )
+    return [
+        dcc.Store(id='path-to-area', data=['France']),
+        menu_map(),
+        html.Div(
+            dcc.Graph(
+                id='map',
+                figure=get_choropleth(FRANCE),
+                clear_on_unhover=True,
+                style={'width': '50vw', 'height': '100vh'}),
+            id='box-map',
+            n_clicks=0
+        )
+    ]
 
 def menu_map():
     return html.Div(
@@ -42,24 +52,56 @@ def menu_map():
 
 # --- FIGURE ---
 
-def get_choropleth():
+def get_choropleth(geoArea: GeographicArea):
     fig = px.choropleth(
-        data_frame=FRANCE.gdf, 
-        geojson=FRANCE.gdf['geometry'], 
-        locations=FRANCE.gdf.index, 
-        center={'lon': FRANCE.geometry.centroid[0].x, 'lat': FRANCE.geometry.centroid[0].y + 0.25},
-        fitbounds='locations')
+        data_frame=geoArea.gdf, 
+        geojson=geoArea.gdf, 
+        locations=geoArea.gdf.index, 
+        scope='europe',
+        fitbounds='locations',
+        hover_name='name',
+        basemap_visible=False
+    )
 
     fig.update_layout(
         showlegend=False, 
-        margin={'r': 0, 't': 0, 'l': 0, 'b': 0})
+        paper_bgcolor='rgba(0,0,0,0)',
+        margin={'r': 0, 't': 0, 'l': 0, 'b': 0}
+    )
 
     return fig
 
 # --- CALLBACKS ---
 
-# fig = px.scatter_mapbox(geo_df,
-#                         lat=geo_df.geometry.y,
-#                         lon=geo_df.geometry.x,
-#                         hover_name="name",
-#                         zoom=1)
+@callback(
+    [Output('map', 'figure'),
+     Output('path-to-area', 'data')],
+    [Input('map', 'clickData'),
+     Input('box-map', 'n_clicks')],
+    [State('path-to-area', 'data'),
+     State('map', 'hoverData')],
+    prevent_initial_call=True)
+def update_map_on_click(clickData, nClicks, pathToArea, hoverMap):
+    if hoverMap is None:
+        return click_outside_area(pathToArea)
+    
+    if clickData is None:
+        return no_update, no_update
+
+    return click_inside_area(clickData, pathToArea)
+    
+def click_inside_area(clickData, pathToArea):
+    area_name = clickData['points'][0].get('hovertext')
+    if area_name is None:
+        return no_update, no_update
+
+    if pathToArea[-1] != area_name:
+        pathToArea = pathToArea + [area_name]
+        return get_choropleth(FRANCE.get_from_path(pathToArea)), pathToArea
+    return get_choropleth(FRANCE.get_from_path(pathToArea)), no_update
+
+def click_outside_area(pathToArea):
+    if len(pathToArea) > 1:
+        pathToArea = pathToArea[:-1]
+        return get_choropleth(FRANCE.get_from_path(pathToArea)), pathToArea
+    return get_choropleth(FRANCE), no_update
