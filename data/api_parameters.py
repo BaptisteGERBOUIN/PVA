@@ -74,10 +74,10 @@ serviceIndicatorServices = {
 
 #Parametres pour l'API Météorologique
 
-# serviceIndicatorServices = {
-#     'url' : ,
-#     'parameters' : {
-#         'size' : SIZE,
-#         'fields' : 'Date,region,departement,communes,Température(°C),Précipitations dans les 24 dernières heures,Coordonnees,communes(codes),department (code),region (code)'
-#         }
-# }
+serviceIndicatorServices = {
+    'url' : 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/donnees-synop-essentielles-omm/records',
+    'parameters' : {
+        'size' : SIZE,
+        'fields' : 'Date,region,departement,communes,Température(°C),Précipitations dans les 24 dernières heures,Coordonnees,communes(codes),department (code),region (code)'
+        }
+}
