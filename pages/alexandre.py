@@ -7,6 +7,7 @@ from data.api_fetcher import get_water_flow_data
 from data.geojson_processing import FRANCE, GeographicArea
 
 import dash_bootstrap_components as dbc
+import dash_leaflet as dl
 import plotly.express as px
 
 register_page(__name__, title='Water A')
@@ -16,15 +17,28 @@ register_page(__name__, title='Water A')
 def layout():
     return [
         dcc.Store(id='path-to-area', data=['France']),
-        menu_map(),
         html.Div(
-            dcc.Graph(
-                id='map',
-                figure=get_choropleth(FRANCE),
-                clear_on_unhover=True,
-                style={'width': '50vw', 'height': '100vh'}),
-            id='box-map',
-            n_clicks=0
+            [
+                menu_map(),
+                dl.Map(
+                    [
+                        dl.TileLayer(),
+                        dl.GeoJSON(
+                            data=FRANCE.gdf_to_json(),
+                            zoomToBounds=True,
+                            zoomToBoundsOnClick=True,
+                            hoverStyle={'color': '#666'},
+                            id='geojson_mapbox'
+                        ),
+                        dl.EasyButton(icon="bi bi-house-door", title="Home France", id="btn_home_france")
+                    ],
+                    zoomSnap=0.2,
+                    dragging=True,
+                    maxBounds=FRANCE.getMaxBounds(),
+                    id='zoomable_map'
+                )
+            ],
+            id='map_container'
         )
     ]
 
@@ -47,7 +61,7 @@ def menu_map():
                 end_date=date(2017, 8, 25)
             ),
         ],
-        style={'display': 'flex', 'justifyContent': 'space-evenly'}
+        id='map_menu_container'
     )
 
 # --- FIGURE ---
@@ -76,7 +90,7 @@ def get_choropleth(geoArea: GeographicArea):
 @callback(
     [Output('map', 'figure'),
      Output('path-to-area', 'data')],
-    [Input('map', 'clickData'),
+    [Input('geojson_mapbox', 'clickData'),
      Input('box-map', 'n_clicks')],
     [State('path-to-area', 'data'),
      State('map', 'hoverData')],

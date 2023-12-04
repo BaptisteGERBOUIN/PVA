@@ -2,6 +2,7 @@ from __future__ import annotations
 from shapely.ops import unary_union
 from numpy import interp
 from copy import deepcopy
+from json import loads
 
 import pandas as pd
 import geopandas as gpd
@@ -31,6 +32,14 @@ class GeographicArea:
     def bounds(self) -> dict[str, float]:
         return self.__geometry.bounds.iloc[0].to_dict()
     
+    def getMaxBounds(self) -> list[tuple(float, float)]:
+        bounds = self.bounds
+        width = bounds['maxx'] - bounds['minx']
+        height = bounds['maxy'] - bounds['miny']
+        return [
+            (bounds['miny'] - height * 0.05, bounds['minx'] - width * 0.05),
+            (bounds['maxy'] + height * 0.05, bounds['maxx'] + width * 0.05)]
+    
     @property
     def name(self) -> str:
         return self.__name
@@ -38,6 +47,9 @@ class GeographicArea:
     @property
     def gdf(self) -> gpd.GeoDataFrame:
         return self.__gdf
+    
+    def gdf_to_json(self) -> dict:
+        return loads(self.__gdf.to_json(drop_id=True))
 
     @property
     def parent(self) -> str:
