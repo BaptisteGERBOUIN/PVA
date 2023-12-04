@@ -7,9 +7,6 @@ Attention à bien exécuter la commande dans le dossier qui contient **"requirem
 
 -  ```pip install -r requirements.txt```
 
-source /net/ens/python-dash/bin/activate
-
-
 D3.js
 Plotly
 echarts

@@ -5,6 +5,7 @@ shapely
 geopandas
 pandas
 numpy
+pymongo
 dash
 dash-bootstrap-components
 dash-core-components

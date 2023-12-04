@@ -1,7 +1,7 @@
 import requests as req
 from tqdm import tqdm
 from pymongo import MongoClient
-from api_parameters import flowWaterObservation, flowWaterStation, qualityStation, qualityAnalyse, serviceIndicatorCommunes, serviceIndicatorIndicateurs, serviceIndicatorServices, donneesMeteorologique
+from data.api_parameters import flowWaterObservation, flowWaterStation, qualityStation, qualityAnalyse, serviceIndicatorCommunes, serviceIndicatorIndicateurs, serviceIndicatorServices, donneesMeteorologique
 
 #----
 #Creation/Connexion à la DataBase
