@@ -3,21 +3,43 @@ import plotly.express as px
 
 from data.api_fetcher import get_nitrate_data
 
+
+
 register_page(__name__, title='Water B')
 
 def layout():
     return html.Div(
         [
             dcc.Graph(figure=scatter_charts()),
+            dcc.Graph(figure=bar_charts()),
         ],
     )
 
 def scatter_charts():
-    fig = px.line(
-        get_nitrate_data(), 
-        x='date_prelevement', 
-        y='resultat', 
-        markers=True,
-        title='Teneur en Nitrates à La Jalle de Blanquefort à Bordeaux.'
+    import pandas as pd
+    import numpy as np
+    fake_data = pd.DataFrame({'prix': range(100, 1000, 100), 
+                              'quantité de boue': map(lambda x: x*x, range(20, 2, -2)),
+                              'taille': np.random.random(9) * 100_000})
+    fig = px.scatter(
+        fake_data,
+        size='taille',
+        x='prix', 
+        y='quantité de boue', 
+        title='quantité de boue / prix'
+    )
+    return fig.update_layout(showlegend=False, title_x=0.5)
+
+def bar_charts():
+    import pandas as pd
+    import numpy as np
+    from data.geojson_processing import FRANCE
+    fake_data = pd.DataFrame({'taux de conformité': np.random.random(len(FRANCE.childs))})
+    fig = px.bar(
+        fake_data,
+        x=list(FRANCE.childs.keys()), 
+        y='taux de conformité', 
+        color='taux de conformité',
+        title='Région / taux de conformité'
     )
     return fig.update_layout(showlegend=False, title_x=0.5)
