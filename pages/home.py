@@ -5,6 +5,6 @@ register_page(__name__, path='/', title='PVA')
 def layout():
     return html.Div(
         [
-            
+            'Bonjour, ceci est notre page de bienvenue :)'
         ],
     )

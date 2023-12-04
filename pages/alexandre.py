@@ -89,20 +89,21 @@ def get_choropleth(geoArea: GeographicArea):
 
 @callback(
     [Output('map', 'figure'),
-     Output('path-to-area', 'data')],
-    [Input('geojson_mapbox', 'clickData'),
+     Output('path-to-area', 'data'),
+     Output('map', 'clickData')],
+    [Input('map', 'clickData'),
      Input('box-map', 'n_clicks')],
     [State('path-to-area', 'data'),
      State('map', 'hoverData')],
     prevent_initial_call=True)
 def update_map_on_click(clickData, nClicks, pathToArea, hoverMap):
     if hoverMap is None:
-        return click_outside_area(pathToArea)
+        return *click_outside_area(pathToArea), None
     
     if clickData is None:
-        return no_update, no_update
+        return no_update, no_update, None
 
-    return click_inside_area(clickData, pathToArea)
+    return *click_inside_area(clickData, pathToArea), None
     
 def click_inside_area(clickData, pathToArea):
     area_name = clickData['points'][0].get('hovertext')

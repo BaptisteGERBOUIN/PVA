@@ -1,6 +1,5 @@
 from __future__ import annotations
 from shapely.ops import unary_union
-from numpy import interp
 from copy import deepcopy
 from json import loads
 
