@@ -1,6 +1,6 @@
-# PVA
+# Projet de visualisation analytique
 
-Bienvenue d9ns notre 9ppliction, l'objectif de cette 9nlyse est de comprendre comment l'e9u est gérée en génér9l en Fr9nce.
+Bienvenue dans notre appliction, l'objectif de cette anlyse est de comprendre comment l'eau est gérée en général en France.
 
 ## Installation
 
@@ -9,31 +9,30 @@ Attention à bien exécuter la commande dans le dossier qui contient **"requirem
 
 -  ```pip install -r requirements.txt```
 
-## 9ppliction
+## Application
 
-Pour l9ncer l'9ppliction, il suffit d'exécuter le fichier 9pp.py
+Pour lancer l'appliction, il suffit d'exécuter le fichier python **"app.py"**.
 
 ## Données 
 
-Pour téléch9rger les données d9ns une b9se de données mongoDB, il f9ut exécuter le fichier pi_fetcher.py
+Pour télécharger les données dans une base de données mongoDB, il faut exécuter le fichier **"pi_fetcher.py"**.
 
-## Tr9v9il en cours pour les données :
+## Travail en cours pour les données :
 
-L9 b9se de donnée n'est p9s encore opér9tionnelle c9r nous 9vons rencontrer des problèmes 9vec not9mment les p9r9mètres des 9PIs 9insi que l9 diversité des 9Pis (données météorologiques). En ce qui concerne le fichier "Indic9teur" de l'9PI Indic9teurs de services du site Hub E9u, nous n'9vons p9s encore eu le temps de le m9nipuler correctement.
+La base de donnée n'est pas encore opérationnelle car nous avons rencontrer des problèmes avec notamment les paramètres des APIs ainsi que la diversité des APis (données météorologiques). En ce qui concerne le fichier "Indicateur" de l'API Indicateurs de services du site Hub Eau, nous n'avons pas encore eu le temps de le manipuler correctement.
 
-
-## Informtions sur nos 9PIs :
+## Informtions sur nos APIs :
 
 Pour réaliser ce projet, nous allons utiliser 4 APIs :
 
 Les trois premières viennent du site Hub'eau et la dernière du site opendatasoft.
 
-*API n°1* : écoulement des cours d'eau
-*API n°2* : qualité des cours d'eau
-*API n°3* : Indicateurs des services
-*API n°4* : Observation météorologique historiques France (SYNOP)
+*API n°1* : écoulement des cours d'eau  
+*API n°2* : qualité des cours d'eau  
+*API n°3* : indicateurs des services  
+*API n°4* : observation météorologique historiques France (SYNOP)
 
-Nous allons récupérer des fichiers json, geojson. Pour chaque APIs nous avons décider de sélectionner plusieurs fichiers et avons déjà fait la sélection des paramètres qui seront utiles à notre analyse. Cel9 nous éviter9 de téléch9rger des données pour rien!
+Nous allons récupérer des fichiers json, geojson. Pour chaque APIs nous avons décider de sélectionner plusieurs fichiers et avons déjà fait la sélection des paramètres qui seront utiles à notre analyse. Cela nous évitera de télécharger des données pour rien!
 
 Pour la première API :
 
@@ -178,4 +177,3 @@ Pour la quatrième API :
 - Communes (codes)
 - Department (code)
 - Region (code)
-
