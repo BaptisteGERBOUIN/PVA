@@ -1,3 +1,5 @@
+# Fichier des paramètres de toutes les APIs
+
 
 BASE_URL = 'https://hubeau.eaufrance.fr/api/'
 SIZE = 20_000
@@ -66,7 +68,7 @@ serviceIndicatorIndicateurs = {
 serviceIndicatorServices = {
     'url' : BASE_URL + 'v0/indicateurs_services/services',
     'parameters' : {
-        'size' : SIZE,
+        'size' : 5_000,
         'fields' : 'code_service,nom_service,codes_commune,noms_commune,annee,indicateurs'
         }
 }
@@ -74,10 +76,10 @@ serviceIndicatorServices = {
 
 #Parametres pour l'API Météorologique
 
-serviceIndicatorServices = {
-    'url' : 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/donnees-synop-essentielles-omm/records',
-    'parameters' : {
-        'size' : SIZE,
-        'fields' : 'Date,region,departement,communes,Température(°C),Précipitations dans les 24 dernières heures,Coordonnees,communes(codes),department (code),region (code)'
+donneesMeteorologique = {
+        'url': 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/donnees-synop-essentielles-omm/records?limit=100',
+        'parameters': {
+            'size': 100,
+            'fields': 'tc, nom_dept, code_dep, nom_reg, code_reg, codegeo, latitude, longitude, rr24'
         }
-}
+    }
