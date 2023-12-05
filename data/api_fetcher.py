@@ -36,9 +36,9 @@ def get_all_data_with_specified_parameters(api_params: dict) -> dict:
 
 
     all_data = [] #Liste pour stocker toutes les données
-    ceiling = 20_000_000# Nombre d'éléments à récupérer à chaque itération
+    ceiling = 20_000# Nombre d'éléments à récupérer à chaque itération
     start_index = 0
-    total_iterations_limit = 100
+    total_iterations_limit = 1
     total_iterations = 0
 
     while total_iterations < total_iterations_limit:
