@@ -21,22 +21,8 @@
     width: 100%;
 }
 
-#path_display {
-    right: 1px;
-    background-color: rgba(0, 123, 255, 0.9);
-    padding: 0px 5px 0px 5px;
-    border-radius: 0px 0px 0px 5px;
+#seg_control {
     position: absolute;
-    user-select: none;
-    z-index: 1000;
-}
-
-.path_display {
-    user-select: none;
-    cursor: pointer;
-    font-size: large;
-}
-
-.path_display:hover {
-    color: white;
+    top: 8px;
+    right: 8px;
 }
