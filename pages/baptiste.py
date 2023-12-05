@@ -1,10 +1,6 @@
 from dash import html, register_page, dcc
 import plotly.express as px
 
-from data.api_fetcher import get_nitrate_data
-
-
-
 register_page(__name__, title='Water B')
 
 def layout():
