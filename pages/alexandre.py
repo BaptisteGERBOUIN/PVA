@@ -9,7 +9,8 @@ import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 import dash_leaflet as dl
 
-register_page(__name__, title='Water A')
+register_page(__name__, name='Alexandre', title='Water A', order=3,
+              category='Visualisation', icon='bi bi-moisture')
 
 # --- HTML ---
 
@@ -47,7 +48,7 @@ def menu_map():
 def viewport_map():
     return dl.Map(
         [
-            # dl.TileLayer(), #add basemap (open-street-map)
+            dl.TileLayer(), #add basemap (open-street-map)
             dl.GeoJSON(
                 data=FRANCE.gdf_to_json(),
                 zoomToBounds=True,

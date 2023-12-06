@@ -1,4 +1,4 @@
-from dash import html
+from dash import html, page_registry
 import dash_bootstrap_components as dbc
 
 def getSidebar():
@@ -12,26 +12,27 @@ def getSidebar():
                 className='water-menu-icon',
             ),
             dbc.Nav(
-                [
-                    html.H2('Accueil', className='water-menu-heading'),
-                    getMenuLink('Menu', '/', 'house'),
-                    html.H2('Visualisation', className='water-menu-heading'),
-                    getMenuLink('Baptiste', '/baptiste', 'water'),
-                    getMenuLink('Alexandre', '/alexandre', 'moisture'),
-                    html.H2('Données', className='water-menu-heading'),
-                    getMenuLink('Origine', '/origin', 'database-check'),
-                    getMenuLink('Table', '/table', 'table'),
-                ],
+                getMenu(),
                 className='water-menu-body',
             ),
         ],
         id='app_sidebar',
     )
 
+def getMenu():
+    menu = []
+    category_name = ''
+    for page in page_registry.values():
+        if category_name != page.get('category'):
+            category_name = page.get('category')
+            menu.append(html.H2(category_name, className='water-menu-heading'))
+        menu.append(getMenuLink(page.get('name'), page.get('path'), page.get('icon')))
+    return menu
+
 def getMenuLink(name: str, path: str, icon_text: str):
     return dbc.NavLink(
         [
-            html.I(className=f'bi bi-{icon_text} sidebar_icon'),
+            html.I(className=f'{icon_text} sidebar_icon'),
             html.Span(name),
             html.Div(className='water-menu-fill-hover'),
         ],
