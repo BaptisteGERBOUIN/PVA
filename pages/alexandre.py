@@ -1,12 +1,12 @@
-from datetime import date
+from datetime import datetime, date, timedelta
 
 from dash import register_page, Input, Output, State, no_update, callback, ctx
 from dash import html, dcc
 
 from data.geojson_processing import FRANCE
 
-import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 import dash_leaflet as dl
 
 register_page(__name__, name='Alexandre', title='Water A', order=3,
@@ -34,12 +34,22 @@ def layout():
 def menu_map():
     return html.Div(
         [
-            dcc.DatePickerRange(
-                id='my-date-picker-range',
-                min_date_allowed=date(1995, 8, 5),
-                max_date_allowed=date(2017, 9, 19),
-                initial_visible_month=date(2017, 7, 5),
-                end_date=date(2017, 8, 25)
+            html.Span('Sélecteur de date', id='date_range_label'),
+            html.Div(
+                dmc.DateRangePicker(
+                    id="date_range_picker",
+                    minDate=date(2020, 8, 5),
+                    value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
+                    clearable=False,
+                ),
+                id='map_date_picker_container'
+            ),
+            dmc.Switch(
+                id='date_map_switch',
+                offLabel=DashIconify(icon="bi:calendar-event", width=20),
+                onLabel=DashIconify(icon="bi:calendar4-range", width=20),
+                checked=True,
+                size="lg",
             ),
         ],
         id='map_menu_container'
@@ -57,7 +67,17 @@ def viewport_map():
             ),
             dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title='Voir France entière', id='btn_home_france'),
             dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward'),
-            dmc.SegmentedControl(data=['Qualité', 'Quantité'], radius='md', id='seg_control')
+            html.Div(
+                [
+                    html.Span('Indicateur :', id='seg_control_label'),
+                    dmc.SegmentedControl(
+                        data=['Qualité', 'Quantité'],
+                        color='blue',
+                        radius='md', 
+                        id='seg_control'
+                    )
+                ]
+            ),
         ],
         zoomSnap=0.2,
         zoomControl=False,
@@ -84,8 +104,7 @@ def viewport_map():
     ],
     [
         State('path_to_area', 'data'),
-    ],
-    prevent_initial_call=True)
+    ])
 def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, statePathToArea):
     triggeredId = ctx.triggered_id
 
@@ -131,3 +150,29 @@ def go_in_area(clickData: dict, pathToArea: list):
         pathToArea = pathToArea + [areaName]
         return FRANCE.get_from_path(pathToArea).gdf_to_json(), pathToArea
     return FRANCE.get_from_path(pathToArea).gdf_to_json(), no_update
+
+@callback(
+    [
+        Output('map_date_picker_container', 'children'),
+    ],
+    [
+        Input('date_map_switch', 'checked'),
+    ])
+def update_map_and_path_on_click(inChecked):
+    if inChecked:
+        return [
+            dmc.DateRangePicker(
+                id="date_range_picker",
+                minDate=date(2020, 8, 5),
+                value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
+                clearable=False,
+            )
+        ]
+    return [
+        dmc.DatePicker(
+            id="date_range_picker",
+            minDate=date(2020, 8, 5),
+            value=[datetime.now().date()],
+            clearable=False,
+        )
+    ]
