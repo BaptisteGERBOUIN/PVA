@@ -13,4 +13,5 @@ dash-extensions
 dash-html-components
 dash-leaflet
 dash-mantine-components
+dash-iconify
 dash-table

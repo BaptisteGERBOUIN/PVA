@@ -1,3 +1,5 @@
+/* LEFT SIDE (MAP) */
+
 #map_container {
     position: relative;
     height: 100vh;
@@ -6,10 +8,24 @@
 
 #map_menu_container {
     display: flex;
-    justify-content: space-evenly;
-    width: 100%;
-    height: 50px;
+    justify-content: center;
+    align-items: center;
+    width: 97%;
+    height: 85%;
     z-index: 1;
+    border: 1px solid rgb(165, 165, 165);
+    background-color: rgb(250, 250, 250);
+    border-radius: 10px;
+    box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.25);
+}
+
+#map_menu_container > *:not(:last-child) {
+    margin-right: 10px;
+}
+
+#date_range_label {
+    font-weight: 600;
+    font-size: medium;
 }
 
 #map_menu_container > * {
@@ -21,22 +37,35 @@
     width: 100%;
 }
 
-#path_display {
-    right: 1px;
-    background-color: rgba(0, 123, 255, 0.9);
-    padding: 0px 5px 0px 5px;
-    border-radius: 0px 0px 0px 5px;
+#seg_control {
     position: absolute;
-    user-select: none;
+    top: 8px;
+    right: 8px;
     z-index: 1000;
 }
 
-.path_display {
-    user-select: none;
-    cursor: pointer;
-    font-size: large;
+#date_range_picker {
+    width: 280px;
 }
 
-.path_display:hover {
-    color: white;
+#seg_control_label {
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 10000;
+}
+
+#map_menu_decor {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* RIGHT SIDE (INFOS) */
+
+#infos_container {
+    position: relative;
+    width: 50%;
+    height: 100vh;
 }

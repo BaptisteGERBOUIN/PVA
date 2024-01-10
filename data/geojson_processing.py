@@ -15,7 +15,9 @@ class GeographicArea:
     def __init__(self, name: str, geometry: gpd.GeoSeries, gdf: gpd.GeoDataFrame, parent: str=None) -> None:
         self.__name = name
         self.__geometry = gpd.GeoSeries(geometry)
-        self.__gdf = gdf
+        self.__gdf = gdf.copy()
+
+        self.__gdf['tooltip'] = '<b>' + self.__gdf['name'] + '</b><br> - code : ' + self.__gdf['code']
 
         self.__parent = parent
         self.__childs: dict[str, GeographicArea] = {}
@@ -90,7 +92,7 @@ def get_france() -> GeographicArea:
     
     France = GeographicArea(
         name='France',
-        gdf=gdfRegion.set_index('code'),
+        gdf=gdfRegion,
         geometry=gpd.GeoSeries(unary_union(gdfRegion['geometry']), crs=CRS))
     
     for _, rowR in gdfRegion.iterrows():
@@ -99,14 +101,14 @@ def get_france() -> GeographicArea:
         Region = GeographicArea(
             name=rowR['name'], 
             geometry=rowR['geometry'], 
-            gdf=filtered_gdf.set_index('code'), 
+            gdf=filtered_gdf, 
             parent='France')
 
         for _, rowD in filtered_gdf.iterrows():
             Departement = GeographicArea(
                 name=rowD['name'], 
                 geometry=rowD['geometry'],
-                gdf=gpd.GeoDataFrame(rowD.to_frame().T.set_index('code')), 
+                gdf=gpd.GeoDataFrame(rowD.to_frame().T), 
                 parent=rowR['name'])
             Region.add_child(Departement)
 

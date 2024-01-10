@@ -6,6 +6,7 @@ from pages.menu.sidebar import getSidebar
 app = Dash(
     __name__,
     use_pages=True,
+    prevent_initial_callbacks=True,
     external_stylesheets=[themes.PULSE, icons.BOOTSTRAP],
     suppress_callback_exceptions=True,
 )

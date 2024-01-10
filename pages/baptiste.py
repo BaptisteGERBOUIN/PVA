@@ -1,7 +1,8 @@
 from dash import html, register_page, dcc
 import plotly.express as px
 
-register_page(__name__, title='Water B')
+register_page(__name__, name='Baptiste', title='Water B', order=2,
+              category='Visualisation', icon='bi bi-water')
 
 def layout():
     return html.Div(
