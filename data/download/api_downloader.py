@@ -38,7 +38,7 @@ def get_data_from_api(url: str, params: dict[str, str], page_size: int=5_000, nb
             api_pbar.update(-1)
 
             total_downloaded += sub_pbar.format_dict['n']
-            api_pbar.set_description(f'API: {url} [Total downloaded: {scale_unit(total_downloaded, unit='B')}]')
+            api_pbar.set_description(f'API: {url} [Total downloaded: {scale_unit(total_downloaded, unit="B")}]')
 
         final_json_data.extend(loads(json_data).get('data', []))
     return final_json_data
