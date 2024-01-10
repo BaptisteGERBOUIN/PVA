@@ -123,3 +123,16 @@ for year in tqdm(range(2018, 2024), unit='year'):
 
         for thread in tqdm(thread_list, leave=False):
             thread.join()
+
+# from pymongo import MongoClient
+
+# MONGODB_URI = 'mongodb://localhost'
+# DATABSE_NAME = 'pva_water_project'
+
+# client = MongoClient(MONGODB_URI)
+# db_water = client[DATABSE_NAME]
+# collection = db_water['indicateurs']
+
+# print(list(collection.find().sort('annee', -1).limit(1)))
+
+# client.close()

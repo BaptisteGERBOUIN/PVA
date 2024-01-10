@@ -22,8 +22,18 @@ CODE_DEPARTEMENTS = gpd.read_file('./data/territoire_france/departements_france.
 # Shared data among threads
 DATA_LOCK = threading.Lock()
 
+def api_ecoulements_to_database(url: str, params: dict[str, str], collection_name: str):
+    client = MongoClient(MONGODB_URI)
+    db_water = client[DATABSE_NAME]
+    collection = db_water[collection_name]
+
+    data = get_data_from_api(url=url, params=params, page_size=20_000, nbr_page=None)
+
+    collection.insert_many(data)
+    client.close()
+
 def get_data_thread(url: str, params: dict[str, str], data: list):
-    thread_data = get_data_from_api(url, params, 20_000, 1, disablePbar=True)
+    thread_data = get_data_from_api(url=url, params=params, page_size=20_000, nbr_page=1, disablePbar=True)
     for row in thread_data:
         row.update({'code_departement': params['code_departement']})
     
@@ -35,9 +45,9 @@ def create_new_download_thread(url: str, params: dict[str, str], data: list) -> 
     download_thread.start()
     return download_thread
 
-def download_by_months_departements_to_database(url: str, params: dict[str, str], collection_name: str, name_field_date: list[str]):
-    from_year = int(params[name_field_date[0]][:4])
-    to_year = int(params[name_field_date[1]][:4])
+def api_qualite_rivieres_to_database(url: str, params: dict[str, str], collection_name: str):
+    from_year = int(params.get('date_debut_prelevement', '2000')[:4])
+    to_year = int(params.get('date_fin_prelevement', str(date.today().year))[:4])
 
     for year in tqdm(range(from_year, to_year), unit='year', desc='Downloading by year'):
         for month in tqdm(range(1, 13), unit='month', leave=False, desc='Downloading by month'):
@@ -49,7 +59,7 @@ def download_by_months_departements_to_database(url: str, params: dict[str, str]
             data = []
             for code in CODE_DEPARTEMENTS:
                 thread_params = deepcopy(params)
-                thread_params.update({name_field_date[0]: str(start_date), name_field_date[1]: str(end_date)})
+                thread_params.update({'date_debut_prelevement': str(start_date), 'date_fin_prelevement': str(end_date)})
                 thread_params.update({'code_departement': code})
 
                 thread_list.append(create_new_download_thread(url, thread_params, data))
@@ -62,53 +72,39 @@ def download_by_months_departements_to_database(url: str, params: dict[str, str]
             db_water[collection_name].insert_many(data)
             client.close()
 
-def download_api_indicateur_by_years_to_database(url: str, params: dict[str, str], collection_name: str):
+def api_indicateurs_to_database(url: str, params: dict[str, str], collection_name: str):
     selected_columns = params.pop('fields').split(',')
 
-    data = []
-    for year in tqdm(range(2000, 2023), unit='year', desc='Downloading by year'):
-        params.update({'annee': year})
-        data.extend(get_data_from_api(url, params, 20_000, 1, disablePbar=True))
+    for code_indicateur in tqdm(params.get('code_indicateur', '').split(','), desc='Downloading by indicator', unit='indicator'):
+        data = []
+        for year in tqdm(range(2008, 2020), unit='year', desc='Downloading by year', leave=False):
+            params.update({'annee': year, 'code_indicateur': code_indicateur})
+            data.extend(get_data_from_api(url, params, 20_000, 1, disablePbar=True))
 
-    data = pd.DataFrame(data)[selected_columns]
-    data['code_departement'] = data['codes_commune'].map(lambda row: int(row[0][:2]) if row and row[0][:2].isnumeric() else pd.NA)
-    data['code_departement'] = data['code_departement'].dropna()
+        data = pd.DataFrame(data)[selected_columns]
+        data['code_departement'] = data['codes_commune'].map(lambda row: int(row[0][:2]) if row and row[0][:2].isnumeric() else pd.NA)
+        data['code_departement'] = data['code_departement'].dropna()
 
-    data = data.drop(columns=['codes_commune'])
-    data['code_indicateur'] = params['code_indicateur']
+        data = data.drop(columns=['codes_commune'])
+        data['code_indicateur'] = params['code_indicateur']
 
-    client = MongoClient(MONGODB_URI)
-    db_water = client[DATABSE_NAME]
-    collection = db_water[collection_name]
-
-    collection.insert_many(data.to_dict('records'))
-    client.close()
-
-def download_upload_to_database(name: str, url: str, params: dict[str, str], name_date_param: dict[str, str]):
-    print(f'> API - {name.capitalize()}')
-    if name == 'ecoulements':
         client = MongoClient(MONGODB_URI)
         db_water = client[DATABSE_NAME]
-        collection = db_water[name]
+        collection = db_water[collection_name]
 
-        data = get_data_from_api(url=url, params=params, page_size=20_000, nbr_page=None)
-
-        collection.insert_many(data)
+        collection.insert_many(data.to_dict('records'))
         client.close()
+
+def download_upload_to_database(collection_name: str, url: str, params: dict[str, str]):
+    print(f'> API - {collection_name.capitalize()}')
+    if collection_name == 'ecoulements':
+        api_ecoulements_to_database(url=url, params=params, collection_name=collection_name)
     
-    elif name == 'qualite_rivieres':
-        download_by_months_departements_to_database(
-            url=url,
-            params=params,
-            collection_name=name,
-            name_field_date=list(name_date_param.values()))
+    elif collection_name == 'qualite_rivieres':
+        api_qualite_rivieres_to_database(url=url, params=params, collection_name=collection_name)
         
-    elif name == 'indicateurs':
-        download_api_indicateur_by_years_to_database(
-            url=url,
-            params=params,
-            collection_name=name
-        )
+    elif collection_name == 'indicateurs_services':
+        api_indicateurs_to_database(url=url, params=params, collection_name=collection_name)
 
 # -- Run --
 
@@ -117,23 +113,8 @@ config.read('./data/download/config.ini')
 
 base_url = config.get('BASE_URL', 'BASE_URL')
 
-download_upload_to_database(
-    name='qualite_rivieres',
-    url=base_url + config.get('API_QUALITE_RIVIERES', 'API_URL'),
-    params=loads(config.get('API_QUALITE_RIVIERES', 'PARAMETERS')),
-    name_date_param=loads(config.get('API_QUALITE_RIVIERES', 'NAME_DATE_PARAMETER'))
-)
-
-download_upload_to_database(
-    name='ecoulements',
-    url=base_url + config.get('API_ECOULEMENTS', 'API_URL'),
-    params=loads(config.get('API_ECOULEMENTS', 'PARAMETERS')),
-    name_date_param=loads(config.get('API_ECOULEMENTS', 'NAME_DATE_PARAMETER'))
-)
-
-download_upload_to_database(
-    name='indicateurs',
-    url=base_url + config.get('API_INDICATEUR_P104.3', 'API_URL'),
-    params=loads(config.get('API_INDICATEUR_P104.3', 'PARAMETERS')),
-    name_date_param=None
-)
+for api in [section for section in config.sections() if 'API' == section[:3]]:
+    download_upload_to_database(
+        url=base_url + config.get(api, 'API_URL'),
+        params=loads(config.get(api, 'PARAMETERS')),
+        collection_name=config.get(api, 'API_NAME'))
