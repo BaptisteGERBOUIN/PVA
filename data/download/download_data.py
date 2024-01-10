@@ -47,7 +47,7 @@ def download_by_months_departements_to_database(url: str, params: dict[str, str]
             end_date = date(year, month, 1) + relativedelta(months=1) - relativedelta(days=1)
 
             data = []
-            for i, code in enumerate(CODE_DEPARTEMENTS):
+            for code in CODE_DEPARTEMENTS:
                 thread_params = deepcopy(params)
                 thread_params.update({name_field_date[0]: str(start_date), name_field_date[1]: str(end_date)})
                 thread_params.update({'code_departement': code})
@@ -124,16 +124,16 @@ download_upload_to_database(
     name_date_param=loads(config.get('API_QUALITE_RIVIERES', 'NAME_DATE_PARAMETER'))
 )
 
-# download_upload_to_database(
-#     name='ecoulements',
-#     url=base_url + config.get('API_ECOULEMENTS', 'API_URL'),
-#     params=loads(config.get('API_ECOULEMENTS', 'PARAMETERS')),
-#     name_date_param=loads(config.get('API_ECOULEMENTS', 'NAME_DATE_PARAMETER'))
-# )
+download_upload_to_database(
+    name='ecoulements',
+    url=base_url + config.get('API_ECOULEMENTS', 'API_URL'),
+    params=loads(config.get('API_ECOULEMENTS', 'PARAMETERS')),
+    name_date_param=loads(config.get('API_ECOULEMENTS', 'NAME_DATE_PARAMETER'))
+)
 
-# download_upload_to_database(
-#     name='indicateurs',
-#     url=base_url + config.get('API_INDICATEUR_P104.3', 'API_URL'),
-#     params=loads(config.get('API_INDICATEUR_P104.3', 'PARAMETERS')),
-#     name_date_param=None
-# )
+download_upload_to_database(
+    name='indicateurs',
+    url=base_url + config.get('API_INDICATEUR_P104.3', 'API_URL'),
+    params=loads(config.get('API_INDICATEUR_P104.3', 'PARAMETERS')),
+    name_date_param=None
+)
