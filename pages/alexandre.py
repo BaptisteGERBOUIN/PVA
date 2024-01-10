@@ -28,31 +28,40 @@ def layout():
                 )
             ],
             id='map_container'
+        ),
+        html.Div(
+            [
+                'coucou'
+            ],
+            id='infos_container'
         )
     ]
 
 def menu_map():
     return html.Div(
-        [
-            html.Span('Sélecteur de date', id='date_range_label'),
-            html.Div(
-                dmc.DateRangePicker(
-                    id="date_range_picker",
-                    minDate=date(2020, 8, 5),
-                    value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
-                    clearable=False,
+        html.Div(
+            [
+                html.Span('Sélecteur de date', id='date_range_label'),
+                html.Div(
+                    dmc.DateRangePicker(
+                        id="date_range_picker",
+                        minDate=date(2020, 8, 5),
+                        value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
+                        clearable=False,
+                    ),
+                    id='map_date_picker_container'
                 ),
-                id='map_date_picker_container'
-            ),
-            dmc.Switch(
-                id='date_map_switch',
-                offLabel=DashIconify(icon="bi:calendar-event", width=20),
-                onLabel=DashIconify(icon="bi:calendar4-range", width=20),
-                checked=True,
-                size="lg",
-            ),
-        ],
-        id='map_menu_container'
+                dmc.Switch(
+                    id='date_map_switch',
+                    offLabel=DashIconify(icon="bi:calendar-event", width=20),
+                    onLabel=DashIconify(icon="bi:calendar4-range", width=20),
+                    checked=True,
+                    size="lg",
+                ),
+            ],
+            id='map_menu_container',
+        ),
+        id='map_menu_decor'
     )
 
 def viewport_map():
@@ -67,16 +76,11 @@ def viewport_map():
             ),
             dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title='Voir France entière', id='btn_home_france'),
             dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward'),
-            html.Div(
-                [
-                    html.Span('Indicateur :', id='seg_control_label'),
-                    dmc.SegmentedControl(
-                        data=['Qualité', 'Quantité'],
-                        color='blue',
-                        radius='md', 
-                        id='seg_control'
-                    )
-                ]
+            dmc.SegmentedControl(
+                data=['Qualité', 'Quantité'],
+                color='blue',
+                radius='md', 
+                id='seg_control'
             ),
         ],
         zoomSnap=0.2,
