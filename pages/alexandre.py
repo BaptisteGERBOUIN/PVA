@@ -5,9 +5,11 @@ from dash import html, dcc
 
 from data.geojson_processing import FRANCE
 
+from dash_extensions.javascript import assign
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 import dash_leaflet as dl
+import data.db_requests as db_requests
 
 register_page(__name__, name='Alexandre', title='Water A', order=3,
               category='Visualisation', icon='bi bi-moisture')
@@ -16,7 +18,7 @@ register_page(__name__, name='Alexandre', title='Water A', order=3,
 
 def layout():
     return [
-        dcc.Store(id='path_to_area', data=['France']),
+        dcc.Store(id='path_to_area', data=[FRANCE.name]),
         html.Div(
             [
                 menu_map(),
@@ -31,7 +33,7 @@ def layout():
         ),
         html.Div(
             [
-                'coucou'
+                infos()
             ],
             id='infos_container'
         )
@@ -41,7 +43,6 @@ def menu_map():
     return html.Div(
         html.Div(
             [
-                html.Span('Sélecteur de date', id='date_range_label'),
                 html.Div(
                     dmc.DateRangePicker(
                         id="date_range_picker",
@@ -65,16 +66,30 @@ def menu_map():
     )
 
 def viewport_map():
+    style_handle = assign("""
+        function(feature, context) {
+            const {classes, colorscale, style, colorProp} = context.hideout;  // get props from hideout
+            const value = feature.properties[colorProp];  // get value the determines the color
+            for (let i = 0; i < classes.length; ++i) {
+                if (value == classes[i]) {
+                    style.fillColor = colorscale[i];  // set the fill color according to the class
+                }
+            }
+            return style;
+        }
+    """)
     return dl.Map(
         [
-            dl.TileLayer(), #add basemap (open-street-map)
+            # dl.TileLayer(), #add basemap (open-street-map)
             dl.GeoJSON(
                 data=FRANCE.gdf_to_json(),
+                style=style_handle,
                 zoomToBounds=True,
                 hoverStyle={'color': '#666'},
-                id='geojson_mapbox'
+                id='geojson_mapbox',
+                hideout={'colorscale': ['#FF0000', '#FFFF00', '#0000FF'], 'classes': ['1', '1a', '1f'], 'colorProp': 'state', 'style': {}}
             ),
-            dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title='Voir France entière', id='btn_home_france'),
+            dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title=f'Voir {FRANCE.name} entière', id='btn_home_france'),
             dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward'),
             dmc.SegmentedControl(
                 data=['Qualité', 'Quantité'],
@@ -90,6 +105,37 @@ def viewport_map():
         attributionControl=False,
         doubleClickZoom=False,
         id='zoomable_map'
+    )
+
+def infos():
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Span(FRANCE.name, id='name_area')
+                ],
+                id='box_name_area'
+            ),
+            dmc.Divider(variant='solid', className='divider_infos'),
+            html.Div(
+                [
+                    DashIconify(icon="bi:clipboard-data", width=20),
+                    html.Span('Nombre d\'observation :', id='text_nbr_observation'),
+                    html.Span(0, id='value_nbr_observation')
+                ],
+                id='box_nbr_observation'
+            ),
+            html.Div(
+                [
+                    DashIconify(icon="bi:flag", width=20),
+                    html.Span('État de la zone :', id='text_state_area'),
+                    html.Span('Inconnu', id='value_state_area')
+                ],
+                id='box_state_area'
+            ),
+            dmc.Divider(variant='solid', className='divider_infos'),
+        ],
+        id='infos_sub_container'
     )
 
 # --- CALLBACKS ---
@@ -124,6 +170,8 @@ def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, statePathToA
     if triggeredId == 'geojson_mapbox':
         geosjonData, pathData = go_in_area(inClickData, statePathToArea)
 
+    # geosjonData = db_requests.data_map(FRANCE.get_from_path(pathData), ['2018-01-01', '2022-06-17'], 'ecoulements')
+
     return geosjonData, pathData, geosjonClickData
 
 def btn_home_map(btn: int):
@@ -132,14 +180,14 @@ def btn_home_map(btn: int):
     """
     if not btn:
         return no_update, no_update
-    return FRANCE.gdf_to_json(), ['France']
+    return FRANCE.gdf_to_json(), [FRANCE.name]
 
 def btn_backward(btn: int, pathToArea: list):
     if not btn:
         return no_update, no_update
     if len(pathToArea[:-1]) > 1:
         return FRANCE.get_from_path(pathToArea[:-1]).gdf_to_json(), pathToArea[:-1]
-    return FRANCE.gdf_to_json(), ['France']
+    return FRANCE.gdf_to_json(), [FRANCE.name]
 
 def go_in_area(clickData: dict, pathToArea: list):
     """
@@ -180,3 +228,15 @@ def update_map_and_path_on_click(inChecked):
             clearable=False,
         )
     ]
+
+@callback(
+    [
+        Output('name_area', 'children'),
+        Output('value_nbr_observation', 'children'),
+        Output('value_state_area', 'children'),
+    ],
+    [
+        Input('path_to_area', 'data')
+    ])
+def update_name_of_area_on_click(inPathToArea):
+    return inPathToArea[-1], 0, 'Inconnu'

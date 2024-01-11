@@ -17,7 +17,21 @@ MONGODB_URI = 'mongodb://localhost'
 DATABSE_NAME = 'pva_water_project'
 
 # List of all French department codes
-CODE_DEPARTEMENTS = gpd.read_file('./data/territoire_france/departements_france.geojson')['code'].to_list()
+import pandas as pd
+import geopandas as gpd
+
+PATH_TO_DATA = './data/territoire_france/'
+
+gdfRegion: gpd.GeoDataFrame = gpd.read_file(PATH_TO_DATA + 'regions_france.geojson'). \
+    rename(columns={'nom': 'Région', 'code': 'code_region'})
+
+dfTerritoire: pd.DataFrame = pd.read_csv(
+        PATH_TO_DATA + 'territoire-francais.csv', 
+        usecols=['Code', 'Département', 'Région'], 
+        sep=';'). \
+    rename(columns={'Code': 'code_departement'})
+
+CODE = dfTerritoire.merge(gdfRegion, on='Région')[['code_region', 'code_departement']]
 
 # Shared data among threads
 DATA_LOCK = threading.Lock()
@@ -34,8 +48,10 @@ def api_ecoulements_to_database(url: str, params: dict[str, str], collection_nam
 
 def get_data_thread(url: str, params: dict[str, str], data: list):
     thread_data = get_data_from_api(url=url, params=params, page_size=20_000, nbr_page=1, disablePbar=True)
+
+    code_region = CODE[CODE['code_departement'] == params['code_departement']]['code_region'].to_list()[0]
     for row in thread_data:
-        row.update({'code_departement': params['code_departement']})
+        row.update({'code_departement': params['code_departement'], 'code_region': code_region})
     
     with DATA_LOCK:
         data.extend(thread_data)
@@ -57,7 +73,7 @@ def api_qualite_rivieres_to_database(url: str, params: dict[str, str], collectio
             end_date = date(year, month, 1) + relativedelta(months=1) - relativedelta(days=1)
 
             data = []
-            for code in CODE_DEPARTEMENTS:
+            for code in CODE['code_departement'].to_list():
                 thread_params = deepcopy(params)
                 thread_params.update({'date_debut_prelevement': str(start_date), 'date_fin_prelevement': str(end_date)})
                 thread_params.update({'code_departement': code})

@@ -10,26 +10,25 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 97%;
-    height: 85%;
     z-index: 1;
-    border: 1px solid rgb(165, 165, 165);
-    background-color: rgb(250, 250, 250);
-    border-radius: 10px;
-    box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.25);
+    border: 1px solid lightgray;
+    background-color: white;
+    border-radius: 5px;
+    padding: 0px 3px 0px 0px;
+    margin-left: 10px;
 }
 
 #map_menu_container > *:not(:last-child) {
     margin-right: 10px;
 }
 
-#date_range_label {
-    font-weight: 600;
-    font-size: medium;
-}
-
 #map_menu_container > * {
     z-index: 1001;
+}
+
+#zoomable_map {
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 0;
 }
 
 #zoomable_map, #map_box {
@@ -39,6 +38,8 @@
 
 #seg_control {
     position: absolute;
+    background-color: white;
+    border: 1px solid lightgray;
     top: 8px;
     right: 8px;
     z-index: 1000;
@@ -59,7 +60,7 @@
     height: 50px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    border-bottom: 1px dashed darkgray;
 }
 
 /* RIGHT SIDE (INFOS) */
@@ -68,4 +69,46 @@
     position: relative;
     width: 50%;
     height: 100vh;
+    padding: 5px;
+}
+
+#infos_sub_container {
+    display: flex;
+    flex-direction: column;
+    height: 60%;
+    padding: 5px;
+    border: 1px solid lightgray;
+    background-color: white;
+    border-radius: 8px;
+}
+
+#box_name_area {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0px 10px 0px;
+    width: 100%;
+}
+
+#name_area {
+    font-weight: 600;
+    font-size: medium;
+    text-transform: uppercase;
+    user-select: none;
+    color: rgb(34, 139, 230);
+    letter-spacing: 2.5px;
+}
+
+#box_nbr_observation, #box_state_area {
+    display: flex;
+    align-items: center;
+    margin: 0px 0px 10px 20px;
+}
+
+#text_nbr_observation, #text_state_area, #value_nbr_observation, #value_state_area {
+    margin-left: 10px;
+}
+
+.divider_infos {
+    border-color: rgb(34, 139, 230);
+    margin-bottom: 10px;    
 }
