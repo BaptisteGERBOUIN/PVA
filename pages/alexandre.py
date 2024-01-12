@@ -10,11 +10,14 @@ import dash_leaflet.express as dlx
 from data.map_pratical_data import APIS_INFO
 from data.geojson_processing import FRANCE
 
+from data.map_pratical_data import Api
+
 import data.db_requests as db_requests
 import view.figure as figure
 
 register_page(__name__, name='Alexandre', title='Water A', order=3,
               category='Visualisation', icon='bi bi-moisture')
+
 # --- HTML ---
 
 def layout():
@@ -46,7 +49,7 @@ def menu_map():
             [
                 html.Div(
                     dmc.DateRangePicker(
-                        id="date_range_picker",
+                        id='date_range_picker',
                         minDate=APIS_INFO.get_api('ecoulements').min_date,
                         maxDate=APIS_INFO.get_api('ecoulements').max_date,
                         value=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
@@ -56,6 +59,20 @@ def menu_map():
                     ),
                     id='map_date_picker_container'
                 ),
+                dmc.Switch(
+                    checked=False,
+                    onLabel='QUALITÉ',
+                    offLabel='QUANTITÉ',
+                    size='lg',
+                    id='switch_qualite_quantite'
+                ),
+                dmc.Select(
+                    data=APIS_INFO.get_api('qualite_rivieres').parameters_names,
+                    value=APIS_INFO.get_api('qualite_rivieres').parameters_names[0],
+                    nothingFound="No options found",
+                    id='dropdown_parameters',
+                    style={'display': 'none'}
+                )
             ],
             id='map_menu_container',
         ),
@@ -63,7 +80,7 @@ def menu_map():
     )
 
 def viewport_map():
-    style_handle = assign("""
+    style_handle = assign('''
         function(feature, context) {
             const {classes, colorscale, style, colorProp} = context.hideout;  // get props from hideout
             const value = feature.properties[colorProp];  // get value the determines the color
@@ -74,12 +91,12 @@ def viewport_map():
             }
             return style;
         }
-    """)
+    ''')
     return dl.Map(
         [
             # dl.TileLayer(), #add basemap (open-street-map)
             dl.GeoJSON(
-                data=db_requests.data_map(
+                data=db_requests.data_map_ecoulement(
                     area=FRANCE,
                     date_range=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
                     api=APIS_INFO.get_api('ecoulements')
@@ -88,23 +105,18 @@ def viewport_map():
                 zoomToBounds=True,
                 hoverStyle={'color': '#666'},
                 id='geojson_mapbox',
-                hideout=APIS_INFO.get_api('ecoulements').hideout
+                hideout=APIS_INFO.get_api('ecoulements').get_hideout()
             ),
             dlx.categorical_colorbar(
-                categories=APIS_INFO.get_api('ecoulements').hideout['classes'],
-                colorscale=APIS_INFO.get_api('ecoulements').hideout['colorscale'],
-                width=300,
+                categories=APIS_INFO.get_api('ecoulements').get_hideout()['classes'],
+                colorscale=APIS_INFO.get_api('ecoulements').get_hideout()['colorscale'],
+                width=500,
                 height=30,
-                position="bottomleft"
+                position='bottomleft',
+                id='colorbar_map'
             ),
             dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title=f'Voir {FRANCE.name} entière', id='btn_home_france'),
-            dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward'),
-            dmc.SegmentedControl(
-                data=['Qualité', 'Quantité'],
-                color='blue',
-                radius='md', 
-                id='seg_control'
-            ),
+            dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward')
         ],
         zoomSnap=0.2,
         zoomControl=False,
@@ -116,7 +128,7 @@ def viewport_map():
     )
 
 def infos():
-    _, nbr_obs, state, dfPieArea, figPieObs = db_requests.data_map(
+    _, nbr_obs, state, dfPieArea, figPieObs = db_requests.data_map_ecoulement(
         area=FRANCE,
         date_range=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
         api=APIS_INFO.get_api('ecoulements')
@@ -131,7 +143,7 @@ def infos():
             ),
             html.Div(
                 [
-                    DashIconify(icon="bi:clipboard-data", width=20),
+                    DashIconify(icon='bi:clipboard-data', width=20),
                     html.Span('Nombre d\'observation :', id='text_nbr_observation'),
                     html.Span(nbr_obs, id='value_nbr_observation')
                 ],
@@ -139,7 +151,7 @@ def infos():
             ),
             html.Div(
                 [
-                    DashIconify(icon="bi:flag", width=20),
+                    DashIconify(icon='bi:flag', width=20),
                     html.Span('État de la zone :', id='text_state_area'),
                     html.Span(state, id='value_state_area')
                 ],
@@ -163,8 +175,8 @@ def tabs(dfPieArea, dfPieObs):
             [
                 dmc.TabsList(
                     [
-                        dmc.Tab("Par sous zone", value="area"),
-                        dmc.Tab("Par observation", value="observation")
+                        dmc.Tab('Par sous zone', value='area'),
+                        dmc.Tab('Par observation', value='observation')
                     ]
                 ),
                 dmc.TabsPanel(
@@ -172,13 +184,13 @@ def tabs(dfPieArea, dfPieObs):
                         figure=figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api('ecoulements')),
                         id='area_result_tab'
                     ),
-                    value="area"),
+                    value='area'),
                 dmc.TabsPanel(
                     dcc.Graph(
                         figure=figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api('ecoulements')),
                         id='observation_result_tab'
                     ),
-                    value="observation")
+                    value='observation')
             ],
             value='area',
             id='tabs_result_by_observation_or_area'
@@ -201,27 +213,49 @@ def tabs(dfPieArea, dfPieObs):
 
         Output('area_result_tab', 'figure'),
         Output('observation_result_tab', 'figure'),
+
+        Output('date_range_picker', 'value'),
+        Output('date_range_picker', 'minDate'),
+        Output('date_range_picker', 'maxDate'),
+        Output('date_range_picker', 'disabledDates'),
+
+        Output('colorbar_map', 'max'),
+        Output('colorbar_map', 'classes'),
+        Output('colorbar_map', 'colorscale'),
+        Output('colorbar_map', 'tickValues'),
+        Output('colorbar_map', 'tickText'),
+
+        Output('geojson_mapbox', 'hideout'),
     ],
     [
         Input('geojson_mapbox', 'clickData'),
         Input('btn_home_france', 'n_clicks'),
         Input('btn_backward', 'n_clicks'),
         Input('date_range_picker', 'value'),
+        Input('switch_qualite_quantite', 'checked'),
+        Input('dropdown_parameters', 'value'),
     ],
     [
         State('path_to_area', 'data'),
     ],
     prevent_initial_callbacks=True)
-def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, inDatePick, statePathToArea):
+def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, inDatePick, inChecked, inParemeter, statePathToArea):
     triggeredId = ctx.triggered_id
 
     mapData, pathData = [no_update] * 2
     geosjonClickData = None
     nameArea, nbrObs, stateArea = [no_update] * 3
     figPieArea, figPieObs = [no_update] * 2
+    date = {'value': no_update, 'minDate': no_update, 'maxDate': no_update, 'disabledDates': no_update}
+    legend = {'max': no_update, 'classes': no_update, 'colorscale': no_update, 'tickValues': no_update, 'tickText': no_update}
+    hideout = no_update
 
     if triggeredId is None:
-        return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs
+        return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs, *list(date.values()), *list(legend.values()), hideout
+
+    api = APIS_INFO.get_api('ecoulements')
+    if inChecked:
+        api = APIS_INFO.get_api('qualite_rivieres')
 
     if triggeredId == 'btn_home_france':
         mapData, pathData = btn_home_map(inBtnHome)
@@ -231,27 +265,38 @@ def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, inDatePick, 
 
     if triggeredId == 'geojson_mapbox':
         mapData, pathData = go_in_area(inClickData, statePathToArea)
+
+    if triggeredId == 'switch_qualite_quantite':
+        date['value'] = [api.max_date, api.max_date]
+        date['minDate'] = api.min_date
+        date['maxDate'] = api.max_date
+        date['disabledDates'] = api.disabled_dates
+        inDatePick = [api.max_date, api.max_date]
+
+    if triggeredId in ['switch_qualite_quantite', 'dropdown_parameters']:
+        if inChecked:
+            legend = update_legend(legend, api, inParemeter)
+            hideout = api.get_hideout(inParemeter)
+        else:
+            legend = update_legend(legend, api, 'default')
+            hideout = api.get_hideout()
+
     
-    if triggeredId == 'date_range_picker':
+    if triggeredId in ['switch_qualite_quantite', 'date_range_picker', 'dropdown_parameters']:
         mapData = FRANCE.get_from_path(statePathToArea)
 
-    mapData, nbrObs, stateArea, dfPieArea, dfPieObs = db_requests.data_map(mapData, inDatePick, APIS_INFO.get_api('ecoulements'))
-
-    if dfPieArea is not None:
-        figPieArea = figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api('ecoulements'))
-
-    if dfPieObs is not None:
-        figPieObs = figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api('ecoulements'))
+    mapData, nbrObs, stateArea, figPieArea, figPieObs = update_with_data(
+        mapData, inDatePick, inChecked, inParemeter, nbrObs, stateArea, figPieArea, figPieObs)
 
     if pathData != no_update:
         nameArea = pathData[-1]
 
-    return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs
+    return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs, *list(date.values()), *list(legend.values()), hideout
 
 def btn_home_map(btn: int):
-    """
+    '''
     Manages the button that takes you back to the most zoomed-out area (France).
-    """
+    '''
     if not btn:
         return no_update, no_update
     return FRANCE, [FRANCE.name]
@@ -264,10 +309,10 @@ def btn_backward(btn: int, pathToArea: list):
     return FRANCE, [FRANCE.name]
 
 def go_in_area(clickData: dict, pathToArea: list):
-    """
+    '''
     Manages a click event to navigate to a specific zone based on the click data 
     supplied and the current path to the zone.
-    """
+    '''
     if clickData is None:
         return no_update, no_update
     areaName = clickData['properties']['name']
@@ -277,15 +322,41 @@ def go_in_area(clickData: dict, pathToArea: list):
         return FRANCE.get_from_path(pathToArea), pathToArea
     return FRANCE.get_from_path(pathToArea), no_update
 
-# @callback(
-#     [
-#         Output('name_area', 'children'),
-#         Output('value_nbr_observation', 'children'),
-#         Output('value_state_area', 'children'),
-#     ],
-#     [
-#         Input('path_to_area', 'data')
-#     ])
-# def update_name_of_area_on_click(inPathToArea):
-#     return inPathToArea[-1], 0, 'Inconnu'
+def update_with_data(mapData, inDatePick, inChecked, inParemeter, nbrObs, stateArea, figPieArea, figPieObs):
+    if inChecked:
+        api_name = 'qualite_rivieres'
+        mapData, nbrObs, stateArea, dfPieArea, dfPieObs = db_requests.data_map_qualite_rivieres(
+            mapData, inDatePick, APIS_INFO.get_api(api_name), inParemeter)
+        figPieArea = figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api(api_name), inParemeter)
+        figPieObs = figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api(api_name), inParemeter)
+    else:
+        api_name = 'ecoulements'
+        mapData, nbrObs, stateArea, dfPieArea, dfPieObs = db_requests.data_map_ecoulement(
+            mapData, inDatePick, APIS_INFO.get_api(api_name))
+        figPieArea = figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api(api_name))
+        figPieObs = figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api(api_name))
 
+    return mapData, nbrObs, stateArea, figPieArea, figPieObs
+
+def update_legend(legend, api: Api, parameter: str):
+    legend = {'max': no_update, 'classes': no_update, 'colorscale': no_update, 'tickValues': no_update, 'tickText': no_update}
+    indices = list(range(len(api.get_hideout(parameter)['classes']) + 1))
+    legend['max'] = len(api.get_hideout(parameter)['classes'])
+    legend['classes'] = indices
+    legend['colorscale'] = api.get_hideout(parameter)['colorscale']
+    legend['tickValues'] = [item + 0.5 for item in indices[:-1]]
+    legend['tickText'] = api.get_hideout(parameter)['classes']
+    return legend
+
+@callback(
+    [
+        Output('dropdown_parameters', 'style'),
+    ],
+    [
+        Input('switch_qualite_quantite', 'checked'),
+    ]
+)
+def toggle_dropdown(inChecked):
+    if inChecked:
+        return {'display': 'block'}, 
+    return {'display': 'none'}, 

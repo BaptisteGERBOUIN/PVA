@@ -4,10 +4,8 @@ from datetime import timedelta, datetime
 from data.db_connexion import get_collection
 from data.geojson_processing import GeographicArea, get_france
 
-from plotly.express.colors import qualitative
-
 class Map_infos:
-    def __init__(self, area: GeographicArea, list_api: list[Api]) -> None:
+    def __init__(self, list_api: list[Api]) -> None:
         self.__dict_api = {}
 
         for api in list_api:
@@ -24,20 +22,13 @@ class Map_infos:
         return self.__area
 
 class Api:
-    def __init__(self, api_name: str, label_params: dict[str, str], colorscale: dict[str, str]) -> None:
+    def __init__(self, api_name: str, label_params: dict[str, str], parameters: dict[str, dict[str, list | dict]]) -> None:
         self.__name = api_name
 
         self.__date_label = label_params['date']
         self.__result_label = label_params['result']
 
-        self.__colorscale = colorscale
-
-        self.__hideout = {
-            'colorscale': list(colorscale.values()),
-            'classes': list(colorscale.keys()),
-            'colorProp': 'encoded_result',
-            'style': {'fillOpacity': 1.0, 'color': 'white', 'weight': 2}
-        }
+        self.__parameters = parameters
 
         self.get_date_info()
 
@@ -60,13 +51,26 @@ class Api:
         self.__min_date = min_date.date().isoformat()
         self.__max_date = max_date.date().isoformat()
         self.__disabled_dates = disabled_dates
+    
+    def get_parameter_slice(self, parameter: str='default'):
+        return self.__parameters.get(parameter, [])[0]
 
-    def get_color(self, key: str):
-        return self.__colorscale.get(key, None)
-
-    @property
-    def get_colors(self):
-        return self.__colorscale
+    def get_hideout(self, parameter: str='default'):
+        return {
+            'colorscale': list(self.__parameters[parameter][1].values()),
+            'classes': list(self.__parameters[parameter][1].keys()),
+            'colorProp': 'encoded_result',
+            'style': {'fillOpacity': 1.0, 'color': 'lightgray', 'weight': 2}
+        }
+    
+    def get_colorscale(self, parameter: str='default'):
+        return self.__parameters[parameter][1]
+    
+    def get_classes(self, parameter: str='default'):
+        return list(self.__parameters[parameter][1].keys())
+    
+    def get_old_keys_to_new(self, parameter: str='default'):
+        return self.__parameters[parameter][2]
 
     @property
     def min_date(self):
@@ -93,22 +97,70 @@ class Api:
         return self.__result_label
     
     @property
-    def hideout(self):
-        return self.__hideout
+    def parameters_names(self):
+        return list(self.__parameters.keys())
 
 def create_API(name: str) -> Api:
     api = None
     if name == 'ecoulements':
-        colorscale = {'1': '#008000', '1a': '#00cc33', '1f': '#afcc00', '2': '#d6e600', '3': '#e69b00', '4': '#e64300', 'None': 'gray'}
-        api = Api(name, {'date': 'date_observation', 'result': 'code_ecoulement'}, colorscale)
+        parameters = {
+            'default': [
+                [],
+                {
+                    'très visible': '#008000',
+                    'visible': '#00cc33',
+                    'visible faible': '#afcc00',
+                    'non visible': '#d6e600',
+                    'assec': '#e69b00',
+                    'impossible': '#e64300',
+                    'sans données': 'gray'
+                },
+                {'1': 'très visible', '1a': 'visible', '1f': 'visible faible', '2': 'non visible', '3': 'assec', '4': 'impossible', 'None': 'sans données'}
+            ]
+        }
+        api = Api(name, {'date': 'date_observation', 'result': 'code_ecoulement'}, parameters)
 
     elif name == 'qualite_rivieres':
-        api = Api(name, {'date': 'date_prelevement', 'result': 'resultat'}, {})
+        parameters = {
+            'Potentiel en Hydrogène (pH)': [
+                [6, 7, 8, 9], 
+                {
+                    'pH (très bas)': 'red',
+                    'pH (bas)': '#ff474c',
+                    'normal': 'green',
+                    'pH (haut)': '#ADD8E6',
+                    'pH (très haut)': 'blue',
+                    'sans données': 'gray'
+                }
+            ],
+            'Conductivité à 20°C': [
+                [50, 1500],
+                {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
+            ],
+            'Matières en suspension': [
+                [0.1, 0.3],
+                {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
+            ],
+            'Potentiel d\'oxydo-réduction': [
+                [40, 300],
+                {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
+            ],
+            'Nitrates': [
+                [0.21, 3.0, 10.0],
+                {
+                    'influence (aucune)': 'green',
+                    'influence (possible)': 'blue',
+                    'influence (nette)': 'orange',
+                    'influence (anormale)': 'red',
+                    'sans données': 'gray'}
+            ]
+        }
+        list_parameters = list(get_collection('qualite_rivieres').distinct('libelle_parametre'))
+        api = Api(name, {'date': 'date_prelevement', 'result': 'resultat'}, parameters)
 
     return api
 
 APIS_INFO = Map_infos(
-    area=get_france(),
     list_api=[
         create_API('ecoulements'),
         create_API('qualite_rivieres')

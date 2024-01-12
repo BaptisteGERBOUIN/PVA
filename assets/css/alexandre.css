@@ -8,8 +8,8 @@
 
 #map_menu_container {
     display: flex;
-    justify-content: center;
     align-items: center;
+    width: 100%;
     z-index: 1;
     border: 1px solid lightgray;
     background-color: white;
@@ -145,4 +145,13 @@
 
 #tabs_result_by_observation_or_area {
     width: 90%;
+}
+
+#date_range_picker {
+    width: 300px;
+}
+
+#dropdown_parameters {
+    right: 1px;
+    width: 250px;
 }
