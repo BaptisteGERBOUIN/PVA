@@ -2,7 +2,8 @@ import dash
 from dash import html, register_page
 import dash_mantine_components as dmc
 
-register_page(__name__, path='/origin', title='Origine')
+register_page(__name__, name='Origine', title='Origine', order=4,
+              category='Données', icon='bi bi-database-check')
 
 def layout():
     return [
