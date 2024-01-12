@@ -12,12 +12,13 @@ CRS = 2154 # France
 
 class GeographicArea:
 
-    def __init__(self, name: str, geometry: gpd.GeoSeries, gdf: gpd.GeoDataFrame, parent: str=None) -> None:
+    def __init__(self, name: str, geometry: gpd.GeoSeries, gdf: gpd.GeoDataFrame, type_area: str, parent: str=None) -> None:
         self.__name = name
         self.__geometry = gpd.GeoSeries(geometry)
         self.__gdf = gdf.copy()
+        self.__type = type_area
 
-        self.__gdf['tooltip'] = '<b>' + self.__gdf['name'] + '</b><br> - code : ' + self.__gdf['code']
+        self.__gdf['tooltip'] = '<b>' + self.__gdf['name'] + ' (' + self.__gdf['code'] + ')'
 
         self.__parent = parent
         self.__childs: dict[str, GeographicArea] = {}
@@ -47,7 +48,11 @@ class GeographicArea:
     
     @property
     def gdf(self) -> gpd.GeoDataFrame:
-        return self.__gdf
+        return self.__gdf.copy()
+    
+    @property
+    def type(self) -> str:
+        return self.__type
     
     def gdf_to_json(self) -> dict:
         return loads(self.__gdf.to_json(drop_id=True))
@@ -91,9 +96,10 @@ def get_france() -> GeographicArea:
         sep=';')
     
     France = GeographicArea(
-        name='France',
+        name='France Métropolitaine (hors Corse)',
         gdf=gdfRegion,
-        geometry=gpd.GeoSeries(unary_union(gdfRegion['geometry']), crs=CRS))
+        geometry=gpd.GeoSeries(unary_union(gdfRegion['geometry']), crs=CRS),
+        type_area='Pays')
     
     for _, rowR in gdfRegion.iterrows():
         filtered_gdf = gdfDepartement[gdfDepartement['name'].isin(
@@ -101,14 +107,16 @@ def get_france() -> GeographicArea:
         Region = GeographicArea(
             name=rowR['name'], 
             geometry=rowR['geometry'], 
-            gdf=filtered_gdf, 
+            gdf=filtered_gdf.reset_index(drop=True),
+            type_area='Région', 
             parent='France')
 
         for _, rowD in filtered_gdf.iterrows():
             Departement = GeographicArea(
                 name=rowD['name'], 
                 geometry=rowD['geometry'],
-                gdf=gpd.GeoDataFrame(rowD.to_frame().T), 
+                gdf=gpd.GeoDataFrame(rowD.to_frame().T).reset_index(drop=True),
+                type_area='Département',
                 parent=rowR['name'])
             Region.add_child(Departement)
 
