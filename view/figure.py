@@ -33,4 +33,4 @@ def gethistopertes(df):
     return [px.histogram(df, x="annee", y="indicateur", marginal="box")]
 
 def get_box_rendement(df):
-    return [px.box(df, y="i
+    return [px.box(df, y="indicateur")]
