@@ -137,14 +137,6 @@ def create_API(name: str) -> Api:
                 [50, 1500],
                 {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
             ],
-            'Matières en suspension': [
-                [0.1, 0.3],
-                {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
-            ],
-            'Potentiel d\'oxydo-réduction': [
-                [40, 300],
-                {'anormal (bas)': 'red', 'normal': 'green', 'anormal (haut)': 'blue', 'sans données': 'gray'}
-            ],
             'Nitrates': [
                 [0.21, 3.0, 10.0],
                 {

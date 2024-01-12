@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 import pandas as pd
 
+from data.geojson_processing import get_departement_name
+
 client = MongoClient("mongodb://localhost:27017")
 db = client["pva_water_project"]
 collection = db["indicateurs_services"]
@@ -25,12 +27,13 @@ def data_bar_plot(selected_departement):
     return filtered_moyenne
 
 def dropdown_annee():
-    annee = dataframe()['annee']
-    return annee
+    return dataframe()['annee']
 
 def dropdown_departement():
-    return dataframe()['code_departement']
-
+    departement = get_departement_name()[['code', 'name']]
+    departement['code'] = departement['code'].astype(int)
+    departement = departement.sort_values('name')
+    return departement
 
 #DEUXIEME INDICATEUR
 

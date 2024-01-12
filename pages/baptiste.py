@@ -1,11 +1,13 @@
 from dash import html, register_page, dcc, callback, Output, Input, State, no_update, ctx
 import dash_mantine_components as dmc
 
-from data.requestsbaptiste import data_box_price, data_bar_plot, dropdown_annee, dropdown_departement, data_bar_reclamation, data_box_renouvellement, data_bar_frequence, data_histo_pertes, data_box_rendement
-from view.figure import getboxplotprice, getbarplotprice, getbarplotreclamation, getboxplotrenouvellement, getboxplotfrequence, gethistopertes, get_box_rendement
+import data.requestsbaptiste as req_baptiste
+import view.figure as figure
 
 register_page(__name__, name='Baptiste', title='Water B', order=2,
               category='Visualisation', icon='bi bi-water')
+
+# --- HTML ---
 
 def layout():
     return [
@@ -15,19 +17,16 @@ def layout():
                         [
                             dmc.Tab("Abonnés", value="abonnes"),
                             dmc.Tab("Réseau", value="reseau"),
-                            dmc.Tab("Qualité de l'eau potable", value="qualite"),
                         ], grow=True,
                     ), 
                     panel_abonne(),
 
-                    panel_reseau(), 
-
-                    panel_qualite(), 
+                    panel_reseau()
                 ], 
-                value="abonnes"
+                value="abonnes",
+                style={'width': '100%'}
             ), 
     ]
-
 
 def panel_abonne():
     return dmc.TabsPanel(
@@ -53,7 +52,6 @@ def panel_abonne():
         value="abonnes",
     )
 
-
 def panel_reseau():
     return  dmc.TabsPanel(
         [
@@ -75,85 +73,15 @@ def panel_reseau():
         value="reseau",
     )
 
-
-def panel_qualite():
-    return  dmc.TabsPanel(
-        [
-            dmc.Tabs(
-                [
-                    dmc.TabsList(
-                        [
-                            dmc.Tab("Conformité physico-chimique de l’eau au robinet", value="physico"),
-                            dmc.Tab("Conformité microbiologique de l’eau au robinet", value="microbio"),
-                        ], grow=True,
-                    ), 
-                    panel_physico(),
-                    panel_microbio(),
-                ], value="physico"
-            ),
-        ],
-        value="qualite",
-    ) 
-
-
 def panel_prix():
     return dmc.TabsPanel(
         [
-            dmc.Tabs(
-                [
-                    dmc.TabsList(
-                        [
-                            dmc.Tab("Les graphiques", value="graphique"),
-                            dmc.Tab("La fiche explicative", value="fiche"),
-                        ], grow=True,
-                    ),
-                    panel_graphique_prix(),
-
-                    panel_fiche_prix(),
-
-                ],
-                value="graphique"
-            ),
-        ],
-        value="prix",
-    )
-
-def dropdown_year():
-    return dcc.Dropdown(
-        id='dropdown-annee',
-        options=[
-            {'label': annee, 'value': annee} for annee in dropdown_annee().unique()
-        ],
-        value=dropdown_annee().unique()[0],
-        multi=False,
-        clearable=False,
-    )
-
-def dropdown_department():
-    return dcc.Dropdown(
-        id='dropdown-departement',
-        options=[
-            {'label': departement, 'value': departement} for departement in dropdown_departement().unique()
-        ],
-        value=dropdown_departement().unique()[0],
-        multi=False,
-        clearable=False,
-    )
-
-def panel_graphique_prix():
-    return html.Div(
-        [
             html.H1("Prix du mètre cube d'eau par département"),
-            dropdown_year(),
-            dropdown_department(),
+            dropdown_year("dropdown-annee-prix"),
+            dropdown_department("dropdown-departement-prix"),
             dcc.Graph(id='prix-m3-graph'),
             dcc.Graph(id='prix-m3-graph2'),
-        ]
-    )
-
-def panel_fiche_prix():
-    return html.Div( 
-        [
+            
             html.H2("Indicateur : Prix du service au m³"),
 
             html.H3("Définition"),
@@ -174,17 +102,15 @@ def panel_fiche_prix():
             ], style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/D102.0.pdf", target="_blank")
-        ]
+        ],
+        value="prix",
     )
 
-
-
-
 def panel_taux():
-    return  html.Div(
+    return dmc.TabsPanel(
         [
             html.H1("Taux de réclamations"),
-            dropdown_year(),
+            dropdown_year("dropdown-annee-reclamation"),
             dcc.Graph(id='reclamation-graph'),
 
             html.H2("Indicateur : Taux de réclamations"),
@@ -211,14 +137,16 @@ def panel_taux():
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P155.1.pdf", target="_blank")
 
-        ])
+        ],
+        value="taux"
+    )
 
 def panel_frequence():
-    return  html.Div(
+    return dmc.TabsPanel(
         [
             html.H1("Représentation de la fréquence des interruptions de service non programmées"),
-            dropdown_year(),
-            dropdown_department(),
+            dropdown_year("dropdown-annee-frequence"),
+            dropdown_department("dropdown-departement-frequence"),
             dcc.Graph(id='frequence-graph'),
 
             html.H2("Indicateur : Continuité du service d'eau potable"),
@@ -246,13 +174,15 @@ def panel_frequence():
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P151.1.pdf", target="_blank")
 
-        ])
+        ],
+        value="frequence"
+    )
 
 def panel_renouvellement():
-    return  html.Div(
+    return dmc.TabsPanel(
         [
             html.H1("Représentation de pourcentage maximum par département du taux de renouvellement du réseau d'eau en France"),
-            dropdown_year(),
+            dropdown_year("dropdown-annee-indicateur"),
             dcc.Graph(id='max-indicateur-graph'),
 
             html.H2("Indicateur : Taux de renouvellement du réseau d'eau potable"),
@@ -276,21 +206,16 @@ def panel_renouvellement():
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P107.2.pdf", target="_blank")
 
-        ])
+        ],
+        value="renouvellement"
+    )
 
 def panel_perte():
-    return  html.Div(
+    return dmc.TabsPanel(
         [
             html.H1("Représentation du total des pertes par année en France"),
-            dcc.Dropdown(
-                id='dropdown-departement',
-                options=[
-                    {'label': departement, 'value': departement} for departement in dropdown_departement().unique()
-                ],
-                value=dropdown_departement().unique()[0],
-                multi=False,
-                clearable=False,
-            ),
+            dropdown_department("dropdown-departement-perte"),
+
             dcc.Graph(id='perte-graph'),
 
             html.H2("Indicateur : Pertes en réseau"),
@@ -314,13 +239,15 @@ def panel_perte():
                 style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P106.3.pdf", target="_blank")
-        ])
+        ],
+        value="perte"
+    )
 
 def panel_rendement():
-    return  html.Div(
+    return dmc.TabsPanel(
         [
             html.H1("Représentation du rendement du réseau de distribution en France"),
-            dropdown_year(),
+            dropdown_year("dropdown-annee-rendement"),
             dcc.Graph(id='rendement-graph'),
 
             html.H2("Indicateur : Rendement du réseau de distribution"),
@@ -345,104 +272,32 @@ def panel_rendement():
 
             html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P104.3.pdf", target="_blank")
 
-        ])
+        ],
+        value="rendement"
+    )
 
-def panel_physico():
-    return  html.Div(
-        [
-            # html.H1("Prix du mètre cube d'eau par département"),
-            # dcc.Dropdown(
-            #     id='dropdown-annee',
-            #     options=[
-            #         {'label': annee, 'value': annee} for annee in dropdown_annee().unique()
-            #     ],
-            #     value=dropdown_annee().unique()[0],
-            #     multi=False,
-            #     clearable=False,
-            # ),
-            # dcc.Dropdown(
-            #     id='dropdown-departement',
-            #     options=[
-            #         {'label': departement, 'value': departement} for departement in dropdown_departement().unique()
-            #     ],
-            #     value=dropdown_departement().unique()[0],
-            #     multi=False,
-            #     clearable=False,
-            # ),
-            # dcc.Graph(id='prix-m3-graph'),
-            # dcc.Graph(id='prix-m3-graph2'),
+def dropdown_year(id: str):
+    years = req_baptiste.dropdown_annee().unique()
+    return dcc.Slider(
+        id=id,
+        min=years.min(),
+        max=years.max(),
+        step=1,
+        marks={str(year): str(year) for year in years},
+        value=years.max(),
+        included=False
+    )
 
-            html.H2("Indicateur : Conformité physico-chimique de l’eau au robinet"),
-
-            html.H3("Définition"),
-            html.P([
-                "Cet indicateur évalue le respect des limites réglementaires de qualité de l'eau distribuée aux usagers, en se concentrant sur des paramètres ",
-                "physico-chimiques spécifiques tels que pesticides, nitrates, chrome, bromate. Pour effectuer cette évaluation, l'indicateur se base sur les mesures ",
-                "réalisées par l'Agence Régionale de Santé (ARS), et dans certaines circonstances, sur celles de l'exploitant du système de distribution d'eau.",
-                "En d'autres termes, l'indicateur permet de vérifier si la qualité de l'eau distribuée répond aux normes réglementaires établies pour différents ",
-                "composants chimiques et physiques. Les paramètres mentionnés, tels que pesticides, nitrates, chrome et bromate, sont souvent soumis à des normes ",
-                "spécifiques en raison de leurs implications sur la santé humaine. L'ARS et l'exploitant effectuent des mesures régulières pour s'assurer que ces ",
-                "normes sont respectées, et cet indicateur offre une évaluation synthétique de cette conformité."
-            ], style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.H3("Unité"),
-            html.P("Il est exprimé en : %", style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.H3("Fréquence de détermination"),
-            html.P("Les prélèvements pris en compte sont ceux dont la date de prise des échantillons est comprise entre le 01 janvier et le 31 décembre de l’année N.",
-                style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P102.1.pdf", target="_blank")
-
-        ])
-
-def panel_microbio():
-    return  html.Div(
-        [
-            # html.H1("Prix du mètre cube d'eau par département"),
-            # dcc.Dropdown(
-            #     id='dropdown-annee',
-            #     options=[
-            #         {'label': annee, 'value': annee} for annee in dropdown_annee().unique()
-            #     ],
-            #     value=dropdown_annee().unique()[0],
-            #     multi=False,
-            #     clearable=False,
-            # ),
-            # dcc.Dropdown(
-            #     id='dropdown-departement',
-            #     options=[
-            #         {'label': departement, 'value': departement} for departement in dropdown_departement().unique()
-            #     ],
-            #     value=dropdown_departement().unique()[0],
-            #     multi=False,
-            #     clearable=False,
-            # ),
-            # dcc.Graph(id='prix-m3-graph'),
-            # dcc.Graph(id='prix-m3-graph2'),
-
-            html.H2("Indicateur : Conformité microbiologique de l’eau au robinet"),
-
-            html.H3("Définition"),
-            html.P([
-                "Cet indicateur évalue le respect des limites réglementaires de qualité de l'eau distribuée aux usagers en ce qui concerne les paramètres ",
-                "bactériologiques, notamment la présence de bactéries pathogènes dans l'eau. Pour effectuer cette évaluation, l'indicateur se base sur les mesures ",
-                "réalisées par l'Agence Régionale de Santé (ARS), et dans certaines circonstances, sur celles de l'exploitant du système de distribution d'eau.",
-                "En substance, cet indicateur vise à garantir que l'eau fournie aux usagers ne contient pas de niveaux dangereux de bactéries pathogènes, ",
-                "conformément aux normes réglementaires. La présence de ces bactéries dans l'eau peut présenter des risques pour la santé humaine, d'où l'importance ",
-                "de surveiller et de maintenir des niveaux de qualité d'eau sûrs. L'ARS et l'exploitant réalisent des mesures régulières pour s'assurer du respect de ",
-                "ces normes, et l'indicateur offre une évaluation synthétique de la conformité de la qualité bactériologique de l'eau distribuée."
-            ], style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.H3("Unité"),
-            html.P("Il est exprimé en : %", style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.H3("Fréquence de détermination"),
-            html.P("Les prélèvements pris en compte sont ceux dont la date de prise des échantillons est comprise entre le 01 janvier et le 31 décembre de l’année N.",
-                style={'font-size': '1.2em', 'margin-bottom': '10px', 'marginTop': '10px'}),
-
-            html.A("Lien vers le document", href="https://www.services.eaufrance.fr/documents/indicators/P101.1.pdf", target="_blank"),
-        ]
+def dropdown_department(id: str):
+    departement = req_baptiste.dropdown_departement()
+    return dcc.Dropdown(
+        id=id,
+        options=[
+            {'label': row.iloc[1], 'value': row.iloc[0]} for _, row in departement.iterrows()
+        ],
+        value=departement['code'].iloc[0],
+        multi=False,
+        clearable=False,
     )
 
 # --- CALLBACKS ---
@@ -450,50 +305,49 @@ def panel_microbio():
 @callback(
     [Output('prix-m3-graph', 'figure'),
      Output('prix-m3-graph2', 'figure')],
-    [Input('dropdown-annee', 'value'),
-     Input('dropdown-departement', 'value')],
+    [Input('dropdown-annee-prix', 'value'),
+     Input('dropdown-departement-prix', 'value')],
 )
 def update_m3_graph(selected_annee, selected_departement):
-    filtered_df = data_box_price(selected_annee, selected_departement)
-    fig = getboxplotprice(filtered_df, selected_annee, selected_departement)
-    filtered_moyenne = data_bar_plot(selected_departement)
-    fig2 = getbarplotprice(filtered_moyenne, selected_departement)
+    filtered_df = req_baptiste.data_box_price(selected_annee, selected_departement)
+    fig = figure.getboxplotprice(filtered_df, selected_annee, selected_departement)
+    filtered_moyenne = req_baptiste.data_bar_plot(selected_departement)
+    fig2 = figure.getbarplotprice(filtered_moyenne, selected_departement)
     return fig, fig2
 
 @callback(
     [Output('reclamation-graph', 'figure')],
-    [Input('dropdown-annee', 'value')]
+    [Input('dropdown-annee-reclamation', 'value')]
 )
 def update_reclamation_graph(selected_annee):
-    return getbarplotreclamation(data_bar_reclamation(selected_annee), selected_annee)
-
+    return figure.getbarplotreclamation(req_baptiste.data_bar_reclamation(selected_annee), selected_annee)
 
 @callback(
     [Output('max-indicateur-graph', 'figure')],
-    [Input('dropdown-annee', 'value')]
+    [Input('dropdown-annee-indicateur', 'value')]
 )
 def update_max_indicateur_graph(selected_annee):
-    return getboxplotrenouvellement(data_box_renouvellement(selected_annee))
+    return figure.getboxplotrenouvellement(req_baptiste.data_box_renouvellement(selected_annee))
 
 @callback(
     [Output('frequence-graph', 'figure')],
-    [Input('dropdown-annee', 'value'),
-     Input('dropdown-departement', 'value')
+    [Input('dropdown-annee-frequence', 'value'),
+     Input('dropdown-departement-frequence', 'value')
     ]
 )
 def update_frequence_graph(selected_annee, selected_departement):
-    return getboxplotfrequence(data_bar_frequence(selected_annee, selected_departement))
+    return figure.getboxplotfrequence(req_baptiste.data_bar_frequence(selected_annee, selected_departement))
 
 @callback(
     [Output('perte-graph', 'figure')],
-    [Input('dropdown-departement', 'value')]
+    [Input('dropdown-departement-perte', 'value')]
 )
 def update_perte_graph(selected_departement):
-    return gethistopertes(data_histo_pertes(selected_departement))
+    return figure.gethistopertes(req_baptiste.data_histo_pertes(selected_departement))
 
 @callback(
     [Output('rendement-graph', 'figure')],
-    [Input('dropdown-annee', 'value')]
+    [Input('dropdown-annee-rendement', 'value')]
 )
 def update_rendement_graph(selected_annee):
-    return get_box_rendement(data_box_rendement(selected_annee))
+    return figure.get_box_rendement(req_baptiste.data_box_rendement(selected_annee))

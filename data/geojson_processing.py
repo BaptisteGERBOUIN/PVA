@@ -84,6 +84,9 @@ class GeographicArea:
 
     def __str__(self) -> str:
         return self.__get_string()
+    
+def get_departement_name() -> gpd.GeoDataFrame :
+    return gpd.read_file(PATH_TO_DATA + 'departements_france.geojson').rename(columns={'nom': 'name'})
 
 def get_france() -> GeographicArea:
     gdfRegion: gpd.GeoDataFrame = gpd.read_file(

@@ -11,7 +11,6 @@ def build_pie_chart_map(df: pd.DataFrame, api: Api, parameter: str='default'):
         color_discrete_map=api.get_colorscale(parameter)
     )
 
-
 def getboxplotprice(df, selected_departement, selected_annee):
     return px.box(df, x='code_departement', y='indicateur', points="all", labels={'indicateur': 'Prix du mètre cube d\'eau'},
         title=f"Prix du mètre cube d'eau pour le département {selected_departement} en {selected_annee}")
