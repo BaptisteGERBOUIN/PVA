@@ -1,19 +1,20 @@
-from datetime import datetime, date, timedelta
-
 from dash import register_page, Input, Output, State, no_update, callback, ctx
+from dash_extensions.javascript import assign
+from dash_iconify import DashIconify
 from dash import html, dcc
 
+import dash_mantine_components as dmc
+import dash_leaflet as dl
+import dash_leaflet.express as dlx
+
+from data.map_pratical_data import APIS_INFO
 from data.geojson_processing import FRANCE
 
-from dash_extensions.javascript import assign
-import dash_mantine_components as dmc
-from dash_iconify import DashIconify
-import dash_leaflet as dl
 import data.db_requests as db_requests
+import view.figure as figure
 
 register_page(__name__, name='Alexandre', title='Water A', order=3,
               category='Visualisation', icon='bi bi-moisture')
-
 # --- HTML ---
 
 def layout():
@@ -46,18 +47,14 @@ def menu_map():
                 html.Div(
                     dmc.DateRangePicker(
                         id="date_range_picker",
-                        minDate=date(2020, 8, 5),
-                        value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
+                        minDate=APIS_INFO.get_api('ecoulements').min_date,
+                        maxDate=APIS_INFO.get_api('ecoulements').max_date,
+                        value=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
+                        disabledDates=APIS_INFO.get_api('ecoulements').disabled_dates,
+                        allowSingleDateInRange=True,
                         clearable=False,
                     ),
                     id='map_date_picker_container'
-                ),
-                dmc.Switch(
-                    id='date_map_switch',
-                    offLabel=DashIconify(icon="bi:calendar-event", width=20),
-                    onLabel=DashIconify(icon="bi:calendar4-range", width=20),
-                    checked=True,
-                    size="lg",
                 ),
             ],
             id='map_menu_container',
@@ -82,12 +79,23 @@ def viewport_map():
         [
             # dl.TileLayer(), #add basemap (open-street-map)
             dl.GeoJSON(
-                data=FRANCE.gdf_to_json(),
+                data=db_requests.data_map(
+                    area=FRANCE,
+                    date_range=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
+                    api=APIS_INFO.get_api('ecoulements')
+                )[0],
                 style=style_handle,
                 zoomToBounds=True,
                 hoverStyle={'color': '#666'},
                 id='geojson_mapbox',
-                hideout={'colorscale': ['#FF0000', '#FFFF00', '#0000FF'], 'classes': ['1', '1a', '1f'], 'colorProp': 'state', 'style': {}}
+                hideout=APIS_INFO.get_api('ecoulements').hideout
+            ),
+            dlx.categorical_colorbar(
+                categories=APIS_INFO.get_api('ecoulements').hideout['classes'],
+                colorscale=APIS_INFO.get_api('ecoulements').hideout['colorscale'],
+                width=300,
+                height=30,
+                position="bottomleft"
             ),
             dl.EasyButton(n_clicks=0, icon='bi bi-house-door', title=f'Voir {FRANCE.name} entière', id='btn_home_france'),
             dl.EasyButton(n_clicks=0, icon='bi bi-arrow-90deg-left', title='Revenir en arrière', id='btn_backward'),
@@ -108,20 +116,24 @@ def viewport_map():
     )
 
 def infos():
+    _, nbr_obs, state, dfPieArea, figPieObs = db_requests.data_map(
+        area=FRANCE,
+        date_range=[APIS_INFO.get_api('ecoulements').max_date, APIS_INFO.get_api('ecoulements').max_date],
+        api=APIS_INFO.get_api('ecoulements')
+    )
     return html.Div(
         [
             html.Div(
                 [
                     html.Span(FRANCE.name, id='name_area')
                 ],
-                id='box_name_area'
+                className='box_title_name'
             ),
-            dmc.Divider(variant='solid', className='divider_infos'),
             html.Div(
                 [
                     DashIconify(icon="bi:clipboard-data", width=20),
                     html.Span('Nombre d\'observation :', id='text_nbr_observation'),
-                    html.Span(0, id='value_nbr_observation')
+                    html.Span(nbr_obs, id='value_nbr_observation')
                 ],
                 id='box_nbr_observation'
             ),
@@ -129,13 +141,49 @@ def infos():
                 [
                     DashIconify(icon="bi:flag", width=20),
                     html.Span('État de la zone :', id='text_state_area'),
-                    html.Span('Inconnu', id='value_state_area')
+                    html.Span(state, id='value_state_area')
                 ],
                 id='box_state_area'
             ),
             dmc.Divider(variant='solid', className='divider_infos'),
+            html.Div(
+                [
+                    html.Span('État de la zone', id='name_graph')
+                ],
+                className='box_title_name'
+            ),
+            tabs(dfPieArea, figPieObs)
         ],
         id='infos_sub_container'
+    )
+
+def tabs(dfPieArea, dfPieObs):
+    return html.Div(
+        dmc.Tabs(
+            [
+                dmc.TabsList(
+                    [
+                        dmc.Tab("Par sous zone", value="area"),
+                        dmc.Tab("Par observation", value="observation")
+                    ]
+                ),
+                dmc.TabsPanel(
+                    dcc.Graph(
+                        figure=figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api('ecoulements')),
+                        id='area_result_tab'
+                    ),
+                    value="area"),
+                dmc.TabsPanel(
+                    dcc.Graph(
+                        figure=figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api('ecoulements')),
+                        id='observation_result_tab'
+                    ),
+                    value="observation")
+            ],
+            value='area',
+            id='tabs_result_by_observation_or_area'
+        ),
+        id='box_result_graph'
     )
 
 # --- CALLBACKS ---
@@ -146,33 +194,59 @@ def infos():
         Output('path_to_area', 'data'),
 
         Output('geojson_mapbox', 'clickData'),
+
+        Output('name_area', 'children'),
+        Output('value_nbr_observation', 'children'),
+        Output('value_state_area', 'children'),
+
+        Output('area_result_tab', 'figure'),
+        Output('observation_result_tab', 'figure'),
     ],
     [
         Input('geojson_mapbox', 'clickData'),
         Input('btn_home_france', 'n_clicks'),
         Input('btn_backward', 'n_clicks'),
+        Input('date_range_picker', 'value'),
     ],
     [
         State('path_to_area', 'data'),
-    ])
-def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, statePathToArea):
+    ],
+    prevent_initial_callbacks=True)
+def update_map_and_path_on_click(inClickData, inBtnHome, inBtnBack, inDatePick, statePathToArea):
     triggeredId = ctx.triggered_id
 
-    geosjonData, pathData = [no_update] * 2
+    mapData, pathData = [no_update] * 2
     geosjonClickData = None
+    nameArea, nbrObs, stateArea = [no_update] * 3
+    figPieArea, figPieObs = [no_update] * 2
+
+    if triggeredId is None:
+        return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs
 
     if triggeredId == 'btn_home_france':
-        geosjonData, pathData = btn_home_map(inBtnHome)
+        mapData, pathData = btn_home_map(inBtnHome)
     
     if triggeredId == 'btn_backward':
-        geosjonData, pathData = btn_backward(inBtnBack, statePathToArea)
+        mapData, pathData = btn_backward(inBtnBack, statePathToArea)
 
     if triggeredId == 'geojson_mapbox':
-        geosjonData, pathData = go_in_area(inClickData, statePathToArea)
+        mapData, pathData = go_in_area(inClickData, statePathToArea)
+    
+    if triggeredId == 'date_range_picker':
+        mapData = FRANCE.get_from_path(statePathToArea)
 
-    # geosjonData = db_requests.data_map(FRANCE.get_from_path(pathData), ['2018-01-01', '2022-06-17'], 'ecoulements')
+    mapData, nbrObs, stateArea, dfPieArea, dfPieObs = db_requests.data_map(mapData, inDatePick, APIS_INFO.get_api('ecoulements'))
 
-    return geosjonData, pathData, geosjonClickData
+    if dfPieArea is not None:
+        figPieArea = figure.build_pie_chart_map(dfPieArea, APIS_INFO.get_api('ecoulements'))
+
+    if dfPieObs is not None:
+        figPieObs = figure.build_pie_chart_map(dfPieObs, APIS_INFO.get_api('ecoulements'))
+
+    if pathData != no_update:
+        nameArea = pathData[-1]
+
+    return mapData, pathData, geosjonClickData, nameArea, nbrObs, stateArea, figPieArea, figPieObs
 
 def btn_home_map(btn: int):
     """
@@ -180,14 +254,14 @@ def btn_home_map(btn: int):
     """
     if not btn:
         return no_update, no_update
-    return FRANCE.gdf_to_json(), [FRANCE.name]
+    return FRANCE, [FRANCE.name]
 
 def btn_backward(btn: int, pathToArea: list):
     if not btn:
         return no_update, no_update
     if len(pathToArea[:-1]) > 1:
-        return FRANCE.get_from_path(pathToArea[:-1]).gdf_to_json(), pathToArea[:-1]
-    return FRANCE.gdf_to_json(), [FRANCE.name]
+        return FRANCE.get_from_path(pathToArea[:-1]), pathToArea[:-1]
+    return FRANCE, [FRANCE.name]
 
 def go_in_area(clickData: dict, pathToArea: list):
     """
@@ -200,43 +274,18 @@ def go_in_area(clickData: dict, pathToArea: list):
 
     if pathToArea[-1] != areaName:
         pathToArea = pathToArea + [areaName]
-        return FRANCE.get_from_path(pathToArea).gdf_to_json(), pathToArea
-    return FRANCE.get_from_path(pathToArea).gdf_to_json(), no_update
+        return FRANCE.get_from_path(pathToArea), pathToArea
+    return FRANCE.get_from_path(pathToArea), no_update
 
-@callback(
-    [
-        Output('map_date_picker_container', 'children'),
-    ],
-    [
-        Input('date_map_switch', 'checked'),
-    ])
-def update_map_and_path_on_click(inChecked):
-    if inChecked:
-        return [
-            dmc.DateRangePicker(
-                id="date_range_picker",
-                minDate=date(2020, 8, 5),
-                value=[datetime.now().date(), datetime.now().date() + timedelta(days=5)],
-                clearable=False,
-            )
-        ]
-    return [
-        dmc.DatePicker(
-            id="date_range_picker",
-            minDate=date(2020, 8, 5),
-            value=[datetime.now().date()],
-            clearable=False,
-        )
-    ]
+# @callback(
+#     [
+#         Output('name_area', 'children'),
+#         Output('value_nbr_observation', 'children'),
+#         Output('value_state_area', 'children'),
+#     ],
+#     [
+#         Input('path_to_area', 'data')
+#     ])
+# def update_name_of_area_on_click(inPathToArea):
+#     return inPathToArea[-1], 0, 'Inconnu'
 
-@callback(
-    [
-        Output('name_area', 'children'),
-        Output('value_nbr_observation', 'children'),
-        Output('value_state_area', 'children'),
-    ],
-    [
-        Input('path_to_area', 'data')
-    ])
-def update_name_of_area_on_click(inPathToArea):
-    return inPathToArea[-1], 0, 'Inconnu'

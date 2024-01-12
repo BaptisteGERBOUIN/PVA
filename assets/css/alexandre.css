@@ -75,23 +75,39 @@
 #infos_sub_container {
     display: flex;
     flex-direction: column;
-    height: 60%;
-    padding: 5px;
+    height: 100%;
+    padding: 25px 5px 5px 5px;
     border: 1px solid lightgray;
     background-color: white;
     border-radius: 8px;
 }
 
-#box_name_area {
+.box_title_name {
     display: flex;
     justify-content: center;
-    margin: 10px 0px 10px 0px;
+    margin: 0px 0px 20px 0px;
+    width: 100%;
+}
+
+#box_legend_name {
+    display: flex;
+    justify-content: center;
+    margin: 0px 0px 20px 0px;
     width: 100%;
 }
 
 #name_area {
     font-weight: 600;
-    font-size: medium;
+    font-size: x-large;
+    text-transform: uppercase;
+    user-select: none;
+    color: rgb(34, 139, 230);
+    letter-spacing: 2.5px;
+}
+
+#name_graph {
+    font-weight: 600;
+    font-size: large;
     text-transform: uppercase;
     user-select: none;
     color: rgb(34, 139, 230);
@@ -101,7 +117,7 @@
 #box_nbr_observation, #box_state_area {
     display: flex;
     align-items: center;
-    margin: 0px 0px 10px 20px;
+    margin: 0px 0px 20px 20px;
 }
 
 #text_nbr_observation, #text_state_area, #value_nbr_observation, #value_state_area {
@@ -110,5 +126,23 @@
 
 .divider_infos {
     border-color: rgb(34, 139, 230);
-    margin-bottom: 10px;    
+    margin-bottom: 20px;
+}
+
+#box_legend {
+    display: flex;
+    justify-content: center;
+}
+
+#box_legend > :not(:last-child) {
+    margin-right: 10px;
+}
+
+#box_result_graph {
+    display: flex;
+    justify-content: center;
+}
+
+#tabs_result_by_observation_or_area {
+    width: 90%;
 }
