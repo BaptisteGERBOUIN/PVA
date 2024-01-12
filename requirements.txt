@@ -5,7 +5,6 @@ shapely
 geopandas
 pandas
 numpy
-pymongo
 dash
 dash-bootstrap-components
 dash-core-components
@@ -15,3 +14,4 @@ dash-leaflet
 dash-mantine-components
 dash-iconify
 dash-table
+plotly.express
