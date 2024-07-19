@@ -87,7 +87,7 @@ def state_map_qualite_rivieres(df: pd.DataFrame, gdf: gpd.GeoDataFrame, api: Api
 def geojson_map_qualite_rivieres(df: pd.DataFrame, gdf: gpd.GeoDataFrame, api: Api, parameter: str, code_label: str):
     gdf = gdf.set_index('code')
     df_encoded_result = df.groupby(code_label)['categories'].agg(lambda x: pd.Series.mode(x)[0])
-    gdf['encoded_result'] = df_encoded_result
+    gdf['encoded_result'] = df_encoded_result.astype(str)
     gdf['encoded_result'] = gdf['encoded_result'].fillna(api.get_classes(parameter)[-1])
 
     return gdf.reset_index()
