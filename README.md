@@ -26,7 +26,7 @@ Pour réaliser ce projet, nous avons utilisé 3 APIs via le site Hub'eau :
 
 Nous avons récupéré des fichiers JSON, GeoJSON. Pour chaque API, nous avons décidé de sélectionner plusieurs fichiers et avons déjà fait la sélection des paramètres qui seront utiles à notre analyse. Cela nous évitera de télécharger des données pour rien ! Pour voir quels paramètres nous avons utilisés, nous vous invitons à vous rendre au fichier `config.ini` qui est dans le dossier `download` du dossier `data`.
 
-## 📈 Extrait du Dashboard
+## 📈 Extraits du Dashboard
 
 !["Niveau de quantité d'eau par région en France métropolitaine hors Corse"](./assets/images/map_quantity.png)
 
